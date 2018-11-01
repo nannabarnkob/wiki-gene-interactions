@@ -3,6 +3,8 @@ A gene interaction database built on Wikipedia mining only.
 
 Final project in Computational Tools for Data Science. 
 
+--- 
+
 ### Time line
 #### Main goal 
 The project consist of the following tasks for the main goal: 
