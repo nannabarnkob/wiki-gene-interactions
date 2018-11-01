@@ -4,7 +4,7 @@ import BloomFilter
 
 
 class BloomFilterExe:
-    Bstart = 98
+    Astart = 97
     Zend = 122
 
     def __init__(self):
@@ -31,12 +31,10 @@ class BloomFilterExe:
         for gene in self.goodData:
             self.filter.train(gene)
 
-    def create(self, j1):
-        return "".join(map(lambda i: chr(random.randint(self.Bstart, self.Zend)), range(j1)))
-
     def createGene(self):
-        # should be updated to make a random gene name instead
-        return "".join([self.create(random.randint(8, 14)), "@", self.create(random.randint(9, 17)), ".", self.create(random.randint(3, 5)),  ".", self.create(2)])
+        return "".join(map(lambda i: chr(random.randint(self.Astart,
+                                                        self.Zend)),
+                           range(random.randint(4, 8))))
 
     def check(self):
         gene = ""
@@ -62,9 +60,9 @@ class BloomFilterExe:
                 if not self.filter.classify(gene):
                     falseNeg += 1
             else:
-                url = self.createGene()
+                gene = self.createGene()
 
-                if self.filter.classify(url):
+                if self.filter.classify(gene):
                     falsePos += 1
 
         print("Total classifications: ", checkSize)

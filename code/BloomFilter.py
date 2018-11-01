@@ -3,7 +3,6 @@ import numpy as np
 
 
 class BloomFilter:
-    # Setup useful variables in here
     def __init__(self, m):
         # received from input set S (m = |S|)
         self.m = m
@@ -13,7 +12,7 @@ class BloomFilter:
 
     # Called once for all good genes
     def train(self, gene):
-        # compute hash values for all url in S
+        # compute hash values for all genes in S
         index_j = []
         for seed in range(self.k):
             hash_val = mmh3.hash(gene, seed) % self.n
@@ -24,7 +23,7 @@ class BloomFilter:
     def classify(self, gene):
         index_j = []
         for seed in range(self.k):
-            hash_val = mmh3.hash(url, seed) % self.n
+            hash_val = mmh3.hash(gene, seed) % self.n
             index_j.append(hash_val)
         if self.A[index_j].all() == 1:
             return True
