@@ -1,10 +1,8 @@
-import BitVector
 import mmh3
 import numpy as np
-import pdb
 
 
-class UrlBloomFilter:
+class BloomFilter:
     # Setup useful variables in here
     def __init__(self, m):
         # received from input set S (m = |S|)
@@ -13,18 +11,17 @@ class UrlBloomFilter:
         self.k = int(self.n/self.m)
         self.A = np.zeros(self.n)
 
-    # Called once for all good URLs
-    def train(self, url):
+    # Called once for all good genes
+    def train(self, gene):
         # compute hash values for all url in S
         index_j = []
         for seed in range(self.k):
-            hash_val = mmh3.hash(url, seed) % self.n
+            hash_val = mmh3.hash(gene, seed) % self.n
             index_j.append(hash_val)
         self.A[index_j] = 1
-#        np.save('filter_obj', self.A)
 
-    # Should return true if the URL is good, otherwise false.
-    def classify(self, url):
+    # Should return true if the gene is good, otherwise false.
+    def classify(self, gene):
         index_j = []
         for seed in range(self.k):
             hash_val = mmh3.hash(url, seed) % self.n
