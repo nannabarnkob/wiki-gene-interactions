@@ -32,9 +32,7 @@ class BloomFilterExe:
             self.filter.train(gene)
 
     def createGene(self):
-        return "".join(map(lambda i: chr(random.randint(self.Astart,
-                                                        self.Zend)),
-                           range(random.randint(4, 8))))
+        return "".join(map(lambda i: chr(random.randint(self.Astart, self.Zend)), range(random.randint(4, 8)))).upper()
 
     def check(self):
         gene = ""
@@ -53,9 +51,10 @@ class BloomFilterExe:
                 print("False positive rate:", falsePos / i)
 
             r = random.randint(0, 10)
+            # test random gene from the good data
             if(r == 7):
                 idx = random.randint(0, self.goodDataLength - 1)
-                url = self.goodData[idx]
+                gene = self.goodData[idx]
 
                 if not self.filter.classify(gene):
                     falseNeg += 1
