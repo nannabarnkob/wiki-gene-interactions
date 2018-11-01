@@ -1,3 +1,0 @@
-Done:
-# Lav clean-up af data, brug kun homo sapiens ID (brug awk) 
-
