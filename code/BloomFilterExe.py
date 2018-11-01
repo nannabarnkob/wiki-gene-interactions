@@ -3,7 +3,8 @@ import sys
 import BloomFilter
 
 
-class BloomFilterExe:
+class BloomFilterTester:
+    # Beginning and end of the alphabet for random gene generation
     Astart = 97
     Zend = 122
 
@@ -27,7 +28,6 @@ class BloomFilterExe:
 
     def train(self):
         print("Training filter...")
-
         for gene in self.goodData:
             self.filter.train(gene)
 
