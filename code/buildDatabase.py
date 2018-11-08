@@ -18,4 +18,5 @@ class BuildDataBase:
     def process_wiki():
         for line in XML:
             if self.bloomfilter.classify(word):
-                "INSERT word INTO interactiontable.partners WHERE gene == y"
+                self.cursor.execute("INSERT word INTO interactiontable.partners
+                                    WHERE gene == y")
