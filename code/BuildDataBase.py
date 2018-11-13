@@ -8,7 +8,6 @@ import subprocess
 import mwparserfromhell
 import datetime
 
-
 class BuildDataBase:
     def connect_database(self, databaseName):
         self.db = sqlite3.connect(databaseName)
@@ -37,6 +36,8 @@ class BuildDataBase:
 
         print("End reading in Wiki at", datetime.datetime.now())
 
+
+
     def process_article(self, title, text):
         """Process a wikipedia article """
 
@@ -46,13 +47,13 @@ class BuildDataBase:
             wikicode = mwparserfromhell.parse(text)
 
             # Find the wikilinks
-            wikilinks = [x.title.strip_code().strip()
-                         for x in wikicode.filter_wikilinks()]
+            wikilinks = [x.title.strip_code().strip() for x in wikicode.filter_wikilinks()]
 
-            passed_links = [
-                x for x in wikilinks if self.bloomfilter.classify(str(x))]
+            passed_links = [x for x in wikilinks if self.bloomfilter.classify(str(x))]
 
             print("Some links in this article", title, ":", passed_links)
+
+
 
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
@@ -63,10 +64,8 @@ class BuildDataBase:
             wikicode = mwparserfromhell.parse(text)
 
             # Find the wikilinks
-            wikilinks = [x.title.strip_code().strip()
-                         for x in wikicode.filter_wikilinks()]
-            passed_links = [wikilinks[i] for i in range(
-                len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
+            wikilinks = [x.title.strip_code().strip() for x in wikicode.filter_wikilinks()]
+            passed_links = [wikilinks[i] for i in range(len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
             print("Some links in this article", title, ":", passed_links)
 
 
@@ -75,4 +74,7 @@ database.main()
 
 data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
 handler = database.process_wiki(data_path)
-# database.find_interactions(handler)
+#database.find_interactions(handler)
+
+
+

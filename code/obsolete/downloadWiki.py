@@ -31,9 +31,10 @@ from keras.utils import get_file
 print("Now downloading...")
 url = 'https://dumps.wikimedia.org/enwiki/20181101/enwiki-20181101-pages-articles-multistream.xml.bz2'
 
-saved_file_path = get_file('enwiki-20181101-pages-articles-multistream.xml.bz2', url)
-# file is now placed in ~/.keras/datasets/
-data_path ='~/.keras/datasets/enwiki-20181101-pages-articles-multistream.xml.bz2'
+saved_file_path = get_file('Volumes/Seagate\ Backup\ Plus\
+                           Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2', url)
+# file is now placed in ~/.keras/datasets/ - wait and see
+data_path = '~/.keras/datasets/enwiki-20181101-pages-articles-multistream.xml.bz2'
 # From here not tested (waiting for download)
 # Iterate through compressed file one line at a time
 
