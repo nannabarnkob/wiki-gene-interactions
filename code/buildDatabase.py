@@ -12,7 +12,7 @@ class BuildDataBase:
     def close(self):
         self.db.close()
 
-    def main():
+    def main(self):
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def process_wiki():
@@ -23,4 +23,4 @@ class BuildDataBase:
 
 
 database = BuildDataBase()
-BuildDataBase.main()
+database.main()
