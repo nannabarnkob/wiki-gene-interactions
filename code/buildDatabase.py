@@ -5,7 +5,7 @@ import sqlite3
 
 
 class BuildDataBase:
-    def connect_database(databaseName):
+    def connect_database(self, databaseName):
         self.db = sqlite3.connect(databaseName)
         self.cursor = self.db.cursor()
 
@@ -15,7 +15,7 @@ class BuildDataBase:
     def main(self):
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
-    def process_wiki():
+    def process_wiki(self):
         for line in XML:
             if self.bloomfilter.classify(word):
                 self.cursor.execute(
