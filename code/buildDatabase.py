@@ -21,7 +21,7 @@ class BuildDataBase:
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def process_wiki(self, wikipath):
-        # Object for handling xml
+        # Object for handling xml, pass on the self.process_article function as how to process each page
         handler = WikiXmlHandler(self.process_article)
 
         # Parsing object
@@ -41,7 +41,6 @@ class BuildDataBase:
         """Process a wikipedia article """
 
         if self.bloomfilter.classify(title):
-            print("Got", title, "which passed filter")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -49,16 +48,16 @@ class BuildDataBase:
             wikilinks = [x.title.strip_code().strip()
                          for x in wikicode.filter_wikilinks()]
 
-            passed_links = [
-                x for x in wikilinks if self.bloomfilter.classify(str(x))]
+            #passed_links = [str(x) for x in wikilinks if self.bloomfilter.classify(str(x))]
+            passed_links = [wikilinks[i] for i in range(
+                len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
+            return passed_links
 
-            print("Some links in this article", title, ":", passed_links)
 
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
 
         if self.bloomfilter.classify(title):
-            print("Got", title, "which passed filter")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -67,12 +66,10 @@ class BuildDataBase:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
-            print("Some links in this article", title, ":", passed_links)
+            return passed_links
 
 
 database = BuildDataBase()
 database.main()
-
 data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
 handler = database.process_wiki(data_path)
-# database.find_interactions(handler)
