@@ -32,7 +32,7 @@ from keras.utils import get_file
 
 print("Now downloading...")
 url = 'https://dumps.wikimedia.org/enwiki/20181101/enwiki-20181101-pages-articles-multistream.xml.bz2'
-
+# refuses to save other than in ~/.keras/datasets
 saved_file_path = get_file('Volumes/Seagate\ Backup\ Plus\
                            Drive/Wikipedia_partitions/enwiki-20181101-pages-articles-multistream.xml.bz2', url)
 # file is now placed in ~/.keras/datasets/ - wait and see
@@ -97,7 +97,7 @@ all_paths = ['/enwiki/20181101/enwiki-20181101-pages-articles1.xml-p10p30302.bz2
                  '/enwiki/20181101/enwiki-20181101-pages-articles27.xml-p57663464p58936625.bz2']
 
 save_to = 'Volumes/Seagate\ Backup\ Plus\ Drive/Wikipedia_partitions/'
-url = 'http://google.com/favicon.icon
+url = 'http://google.com/favicon.icon'
 base = 'https://dumps.wikimedia.org'
 for url in all_paths:
     full_path = base + url

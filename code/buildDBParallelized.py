@@ -14,7 +14,8 @@ import sys
 
 class BuildDataBase:
     def __init__(self, wikifolder):
-        self.partitions = [wikifolder + x for x in os.listdir(wikifolder)][0:10]
+        self.partitions = [wikifolder + x for x in os.listdir(wikifolder)]
+        self._finished_count = 0
 
     def connect_database(self, databaseName):
         self.db = sqlite3.connect(databaseName)
@@ -38,24 +39,27 @@ class BuildDataBase:
         depending on the language, more or less similar to a variable (see first-class functions). 
         """
 
-        handler = WikiXmlHandler(self.process_article)
+        # parse wikipath to object ot log file ?
+        handler = WikiXmlHandler(self.process_article, wikipath)
 
         # Parsing object
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
 
         # Iterate through compressed file one line at a time
-        print("Begin reading in Wiki at", datetime.datetime.now())
+        print("Begin processing", wikipath, " at", datetime.datetime.now())
         for line in subprocess.Popen(['bzcat'],
                                      stdin=open(wikipath),
                                      stdout=subprocess.PIPE).stdout:
             parser.feed(line)
 
         print("End reading in Wiki at", datetime.datetime.now())
+        self._finished_count += 1
+        print("Now finished", self._finished_count, "jobs")
 
     def parallelize(self):
         # Create a pool of workers to execute processes
-        pool = Pool(processes=10)
+        pool = Pool(processes=4)
 
         # Map (service, tasks), applies function to each partition
 

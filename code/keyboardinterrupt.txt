@@ -1,0 +1,266 @@
+^CProcess ForkPoolWorker-16:
+Process ForkPoolWorker-10:
+Process ForkPoolWorker-11:
+Process ForkPoolWorker-9:
+Traceback (most recent call last):
+Process ForkPoolWorker-14:
+Process ForkPoolWorker-15:
+  File "buildDBParallelized.py", line 94, in <module>
+Process ForkPoolWorker-13:
+Process ForkPoolWorker-12:
+Process ForkPoolWorker-7:
+Process ForkPoolWorker-2:
+
+  File "buildDBParallelized.py", line 52, in parallelize
+Process ForkPoolWorker-3:
+Process ForkPoolWorker-6:
+Process ForkPoolWorker-4:
+    parser.feed(line)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 268, in map
+Process ForkPoolWorker-5:
+Process ForkPoolWorker-1:
+Process ForkPoolWorker-8:
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 651, in get
+    self.wait(timeout)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 648, in wait
+    self._event.wait(timeout)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 552, in wait
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.frameTraceback (most recent call last):
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+    signaled = self._cond.wait(timeout)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 296, in wait
+KeyboardInterrupt
+    waiter.acquire()
+work/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 351, in get
+    with self._rlock:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/synchronize.py", line 96, in __enter__
+    return self._semlock.__enter__()
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 110, in worker
+    task = get()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/queues.py", line 352, in get
+    res = self._reader.recv_bytes()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/connection.py", line 216, in recv_bytes
+    buf = self._recv_bytes(maxlength)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/connection.py", line 407, in _recv_bytes
+    buf = self._recv(4)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/connection.py"KeyboardInterrupt
+, line 379, in _recv
+    chunk = read(handle, remaining)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 466, in EndElement
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 336, in end_element
+    self._cont_handler.endElement(name)
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 41, in endElement
+    self._values[name] = ' '.join(self._buffer)
+KeyboardInterrupt
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 280, in CharacterData
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 28, in characters
+    self._buffer.append(content)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 280, in CharacterData
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 25, in characters
+    def characters(self, content):
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 280, in CharacterData
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 25, in characters
+    def characters(self, content):
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 280, in CharacterData
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 25, in characters
+    def characters(self, content):
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 41, in process_wiki
+    handler = WikiXmlHandler(self.process_article)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 412, in StartElement
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 332, in start_element
+    def start_element(self, name, attrs):
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 121, in worker
+    result = (True, func(*args, **kwds))
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py", line 44, in mapstar
+    return list(map(*args))
+  File "buildDBParallelized.py", line 42, in process_wiki
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 217, in feed
+    self._parser.Parse(data, isFinal)
+  File "/Users/sysadmin/build/v3.7.0/Modules/pyexpat.c", line 466, in EndElement
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/xml/sax/expatreader.py", line 336, in end_element
+    self._cont_handler.endElement(name)
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/WikiXmlHandler.py", line 54, in endElement
+    passed_links = self.callback(**self._values)
+  File "buildDBParallelized.py", line 59, in process_article
+    # Map (service, tasks), applies function to each partition
+  File "/Users/nannabarnkob/Documents/DTU/Computational Tools for Big Data/FinalProject/wiki-gene-interactions/code/BloomFunctions.py", line 55, in classify
+    if self.A[index_j].all() == 1:
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/numpy/core/_methods.py", line 46, in _all
+    return umr_all(a, axis, dtype, out, keepdims)
+KeyboardInterrupt
