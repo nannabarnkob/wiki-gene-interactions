@@ -22,6 +22,12 @@ class BuildDataBase:
 
     def main(self):
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
+        safeGenesFile = open('../data/gene_symbol_list.txt','r')
+        self.safeGenes = set()
+        for line in safeGenesFile:
+            self.safeGenes.add(line)
+
+        print(self.safeGenes)
 
         parser = argparse.ArgumentParser()
         parser.add_argument('db', help="Input a database name and file containing data")
@@ -88,7 +94,8 @@ class BuildDataBase:
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
 
-        if self.bloomfilter.classify(title):
+        if title in self.safeGenes:
+            print("Got", title, "which passed filter")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -96,11 +103,14 @@ class BuildDataBase:
             wikilinks = [x.title.strip_code().strip()
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
-                len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
-            return passed_links
+                len(wikilinks)) if wikilinks[i] in self.safeGenes]
+            print("Some links in this article", title, ":", passed_links)
+
 
 
 database = BuildDataBase()
 database.main()
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+
+data_path = '/Users/michelle/Desktop/enwiki-20181101-pages-articles-multistream.xml.bz2'
 handler = database.process_wiki(data_path)
+database.find_interactions(handler)
