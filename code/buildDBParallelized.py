@@ -10,6 +10,7 @@ import argparse
 import datetime
 import os
 from multiprocessing import Pool
+import dill
 import pathos.multiprocessing as mp
 
 import sys
@@ -121,6 +122,7 @@ class BuildDataBase:
             #passed_links = [str(x) for x in wikilinks if self.bloomfilter.classify(str(x))]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
+            # indsæt i return
             return passed_links
 
     def process_article_with_set_lookup(self, title, text):
