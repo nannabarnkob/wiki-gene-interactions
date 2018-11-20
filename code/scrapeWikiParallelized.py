@@ -34,7 +34,7 @@ class ScrapeWiki:
 
 
     def process_wiki(self, wikipath, method='set'):
-        # establish connection to db that we parse to xml handler 
+        # establish connection to db that we parse to xml handler
         db = sqlite3.connect('gene-database')
         cursor = db.cursor()
 
