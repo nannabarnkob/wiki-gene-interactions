@@ -11,53 +11,10 @@ import mwparserfromhell
 import datetime
 import pdb
 
-class BuildDataBase:
-
+class ScrapeWiki:
     def main(self):
-        self.arg_parser()
-        self.make_database()
         self.load_safegenes()
-        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
-
-
-    def arg_parser(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument('db', help="Input a database name and file containing data")
-        parser.add_argument('filename', help = 'Input file name of data file')
-        self.args = parser.parse_args()
-
-
-    def close_database(self):
-        self.db.close()
-
-    def make_database(self):
-        databaseName = self.args.db
-        filename = self.args.filename
-
-        # connect to database
-        self.db = sqlite3.connect(databaseName)
-        self.cursor = self.db.cursor()
-
-        # make the main table
-        self.createTable()
-        # read genes
-        self.addData(filename)
-
-    def createTable(self):
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS gene_interactions(geneID TEXT PRIMARY KEY , symbol TEXT DEFAULT NULL, aliases TEXT DEFAULT NULL, interactions TEXT)")
-
-    def addData(self,fileName):
-        #self.cursor.execute("DELETE FROM gene_interactions")
-        #'/users/kth/wiki-gene-interactions/data/id_symbol_alias.txt'
-        with open(fileName, "r") as f:
-            head = f.readline()
-            allData = []
-            for line in f:
-                p = [s.strip() for s in line.split('\t')]
-                allData.append(p)
-            self.cursor.executemany("INSERT OR REPLACE INTO gene_interactions(geneID, symbol, aliases) VALUES (?,?,?)", allData)
-            self.db.commit()
+        self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
@@ -109,7 +66,6 @@ class BuildDataBase:
 
         if title in self.safeGenes:
             print("Got", title, "which was found in set")
-            pdb.set_trace()
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -119,13 +75,11 @@ class BuildDataBase:
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
             #print("Some links in this article", title, ":", passed_links)
-        return passed_links
+            return passed_links
 
-
-database = BuildDataBase()
-database.main()
 
 data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
-#handler = database.process_wiki(data_path, method='bloom')
-handler = database.process_wiki(data_path, method='set')
+wikiscraper = ScrapeWiki()
+wikiscraper.main()
+wikiscraper.process_wiki(data_path, method='set')
 
