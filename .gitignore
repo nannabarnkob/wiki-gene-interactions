@@ -10,3 +10,6 @@ Thumbs.db
 *.swp
 test_data/
 .idea
+interactions*
+log*
+venv/

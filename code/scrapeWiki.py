@@ -15,7 +15,7 @@ import pdb
 class ScrapeWiki:
     def main(self):
         self.load_safegenes()
-        self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
+        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
@@ -25,12 +25,15 @@ class ScrapeWiki:
                 self.safeGenes.add(line)
 
     def process_wiki(self, wikipath, method='bloom'):
+        # establish connection to db that we parse to xml handler
+        db = sqlite3.connect('gene-database')
+        cursor = db.cursor()
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath)
+            handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath, cursor)
         elif method == 'set':
             print(self.safeGenes)
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
 
         # Parsing object
         parser = xml.sax.make_parser()
