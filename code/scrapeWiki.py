@@ -15,7 +15,7 @@ import pdb
 class ScrapeWiki:
     def main(self):
         self.load_safegenes()
-        self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
+        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
@@ -25,12 +25,15 @@ class ScrapeWiki:
                 self.safeGenes.add(line)
 
     def process_wiki(self, wikipath, method='bloom'):
+        # establish connection to db that we parse to xml handler
+        db = sqlite3.connect('gene-database')
+        cursor = db.cursor()
+
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath)
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor)
         elif method == 'set':
-            print(self.safeGenes)
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
 
         # Parsing object
         parser = xml.sax.make_parser()
@@ -66,7 +69,7 @@ class ScrapeWiki:
         """Process a wikipedia article with set look-up"""
 
         if title in self.safeGenes:
-            print("Got", title, "which was found in set")
+            #print("Got", title, "which was found in set")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -79,7 +82,7 @@ class ScrapeWiki:
             return passed_links
 
 
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+data_path = '/users/kth/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
 wikiscraper = ScrapeWiki()
 wikiscraper.main()
 wikiscraper.process_wiki(data_path, method='set')
