@@ -6,24 +6,24 @@ import sqlite3
 import xml.sax
 import subprocess
 import mwparserfromhell
+import argparse
 import datetime
 import os
 from multiprocessing import Pool
+import pathos.multiprocessing as mp
+
 import sys
 
 
 class BuildDataBase:
     def __init__(self, wikifolder):
+        self.arg_parser()
         self.partitions = [wikifolder + x for x in os.listdir(wikifolder)]
         self._finished_count = 0
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
-    def connect_database(self, databaseName):
-        self.db = sqlite3.connect(databaseName)
-        self.cursor = self.db.cursor()
 
     def main(self):
-        self.arg_parser()
         self.make_database()
         self.load_safegenes()
 
@@ -74,11 +74,10 @@ class BuildDataBase:
                 self.safeGenes.add(line)
 
 
-
     def process_wiki(self, wikipath, method='bloom'):
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath)
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath)
         elif method == 'set':
             print(self.safeGenes)
             handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
@@ -90,7 +89,7 @@ class BuildDataBase:
         # Iterate through compressed file one line at a time
         print("Begin reading in Wiki at", datetime.datetime.now())
         for line in subprocess.Popen(['bzcat'],
-                                     stdin=open(data_path),
+                                     stdin=open(wikipath),
                                      stdout=subprocess.PIPE).stdout:
             parser.feed(line)
 
@@ -101,10 +100,9 @@ class BuildDataBase:
 
     def parallelize(self):
         # Create a pool of workers to execute processes
-        pool = Pool(processes=4)
+        pool = mp.Pool(processes=4)
 
         # Map (service, tasks), applies function to each partition
-
         pool.map(self.process_wiki, self.partitions)
         pool.close()
         pool.join()
@@ -140,10 +138,12 @@ class BuildDataBase:
             return passed_links
 
 
-# wikifolder = '/Volumes/Seagate Backup Plus Drive/Wikipedia_partitions/'
-wikifolder = sys.argv[1]
+wikifolder = '/Volumes/Seagate Backup Plus Drive/Wikipedia_partitions/'
 database = BuildDataBase(wikifolder)
+
+wikifullpath = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
 database.main()
 database.parallelize()
-#data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+#database.process_wiki(wikifullpath)
+
 # handler = database.process_wiki(data_path)
