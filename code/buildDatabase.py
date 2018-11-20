@@ -13,31 +13,35 @@ import datetime
 
 class BuildDataBase:
 
-    def connect_to_database(self, databaseName):
-        self.db = sqlite3.connect(databaseName)
-        self.cursor = self.db.cursor()
-
-    def close(self):
-        self.db.close()
-
     def main(self):
+        self.arg_parser()
+        self.make_database()
+        self.load_safegenes()
         self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
-        safeGenesFile = open('../data/gene_symbol_list.txt','r')
-        self.safeGenes = set()
-        for line in safeGenesFile:
-            self.safeGenes.add(line)
 
-        print(self.safeGenes)
 
+
+    def arg_parser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('db', help="Input a database name and file containing data")
         parser.add_argument('filename', help = 'Input file name of data file')
-        args = parser.parse_args()
-        databaseName = args.db
-        filename = args.filename
+        self.args = parser.parse_args()
 
-        self.connect_to_database(databaseName)
+
+    def close_database(self):
+        self.db.close()
+
+    def make_database(self):
+        databaseName = self.args.db
+        filename = self.args.filename
+
+        # connect to database
+        self.db = sqlite3.connect(databaseName)
+        self.cursor = self.db.cursor()
+
+        # make the main table
         self.createTable()
+        # read genes
         self.addData(filename)
 
     def createTable(self):
@@ -56,10 +60,20 @@ class BuildDataBase:
             self.cursor.executemany("INSERT OR REPLACE INTO gene_interactions(geneID, symbol, aliases) VALUES (?,?,?)", allData)
             self.db.commit()
 
-        f.close()
-    def process_wiki(self, wikipath):
+    def load_safegenes(self):
+        with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
+            self.safeGenes = set()
+            for line in safeGenesFile:
+                line = line.strip()
+                self.safeGenes.add(line)
+
+    def process_wiki(self, wikipath, method='bloom'):
         # Object for handling xml, pass on the self.process_article function as how to process each page
-        handler = WikiXmlHandler(self.process_article)
+        if method == 'bloom':
+            handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath)
+        elif method == 'set':
+            print(self.safeGenes)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
 
         # Parsing object
         parser = xml.sax.make_parser()
@@ -74,7 +88,7 @@ class BuildDataBase:
 
         print("End reading in Wiki at", datetime.datetime.now())
 
-    def process_article(self, title, text):
+    def process_article_with_bloom(self, title, text):
         """Process a wikipedia article """
 
         if self.bloomfilter.classify(title):
@@ -111,6 +125,7 @@ class BuildDataBase:
 database = BuildDataBase()
 database.main()
 
-data_path = '/Users/michelle/Desktop/enwiki-20181101-pages-articles-multistream.xml.bz2'
-handler = database.process_wiki(data_path)
+data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+#handler = database.process_wiki(data_path, method='bloom')
+handler = database.process_wiki(data_path, method='set')
 database.find_interactions(handler)
