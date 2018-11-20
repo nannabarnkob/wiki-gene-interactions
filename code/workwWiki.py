@@ -34,8 +34,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
 
 # external hard drive path
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
-
+data_path = '/Users/michelle/Desktop/enwiki-20181101-pages-articles-multistream.xml.bz2'
 # Iterate through compressed file one line at a time
 
 # Object for handling xml
