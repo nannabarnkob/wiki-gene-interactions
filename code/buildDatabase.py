@@ -125,7 +125,7 @@ class BuildDataBase:
 database = BuildDataBase()
 database.main()
 
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+data_path = '/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
 #handler = database.process_wiki(data_path, method='bloom')
 handler = database.process_wiki(data_path, method='set')
 
