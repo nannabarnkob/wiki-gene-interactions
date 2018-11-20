@@ -11,6 +11,7 @@ import mwparserfromhell
 import datetime
 import pdb
 
+
 class ScrapeWiki:
     def main(self):
         self.load_safegenes()
