@@ -9,7 +9,7 @@ import xml.sax
 import subprocess
 import mwparserfromhell
 import datetime
-
+import pdb
 
 class BuildDataBase:
 
@@ -17,8 +17,7 @@ class BuildDataBase:
         self.arg_parser()
         self.make_database()
         self.load_safegenes()
-        self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
-
+        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
 
     def arg_parser(self):
@@ -109,7 +108,8 @@ class BuildDataBase:
         """Process a wikipedia article with set look-up"""
 
         if title in self.safeGenes:
-            print("Got", title, "which passed filter")
+            print("Got", title, "which was found in set")
+            pdb.set_trace()
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -118,7 +118,7 @@ class BuildDataBase:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
-            print("Some links in this article", title, ":", passed_links)
+            #print("Some links in this article", title, ":", passed_links)
 
 
 
@@ -128,4 +128,4 @@ database.main()
 data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
 #handler = database.process_wiki(data_path, method='bloom')
 handler = database.process_wiki(data_path, method='set')
-database.find_interactions(handler)
+
