@@ -4,7 +4,7 @@ import datetime
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
     """Content handler for Wiki XML data using SAX"""
-    def __init__(self, callback, filename):
+    def __init__(self, callback, filename, cursor):
         xml.sax.handler.ContentHandler.__init__(self)
         self._buffer = None
         self._article_count = 0
@@ -21,6 +21,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self.fh_log = open(log_name, "a")
 
         self.starttime = datetime.datetime.now()
+
+        self.cursor = cursor
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -55,6 +57,12 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
             if passed_links:
                 self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
+                selection = self.cursor.execute("SELECT * FROM gene_interactions WHERE symbol = 'BRCA1'").fetchall()
+                print(selection)
+                # reorganizer
+                # update database
+
+
 
 
 

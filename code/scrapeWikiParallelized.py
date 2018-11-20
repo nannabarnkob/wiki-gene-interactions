@@ -34,15 +34,20 @@ class ScrapeWiki:
 
 
     def process_wiki(self, wikipath, method='set'):
+        # establish connection to db that we parse to xml handler 
+        db = sqlite3.connect('gene-database')
+        cursor = db.cursor()
+
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath)
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor)
         elif method == 'set':
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
 
         # Parsing object
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
+
 
         # Iterate through compressed file one line at a time
         print("Begin reading in Wiki at", datetime.datetime.now())
