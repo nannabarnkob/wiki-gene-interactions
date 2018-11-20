@@ -1,5 +1,6 @@
 import subprocess
 import xml.sax
+import mwparserfromhell
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
@@ -34,35 +35,32 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
 # external hard drive path
 data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+
 # Iterate through compressed file one line at a time
 
 # Object for handling xml
 handler = WikiXmlHandler()
+
 # Parsing object
 parser = xml.sax.make_parser()
 parser.setContentHandler(handler)
-from datetime import datetime
-print("Begin at", datetime.now())
+
+
 # Iteratively process file
 for line in subprocess.Popen(['bzcat'],
                              stdin=open(data_path),
                              stdout=subprocess.PIPE).stdout:
     parser.feed(line)
-    if len(handler._pages) % 1000 == 1:
-        print(len(handler._pages))
-
-print("End at", datetime.now())
-# I currently don't know how long it would take to process all the lines
-"""
-    # Stop when 3 articles have been found
     if len(handler._pages) > 2:
         break
-"""
+
+# I currently don't know how long it would take to process all the lines
+    # Stop when 3 articles have been found
+
 # If we inspect handler._pages , we’ll see a list, each element of which is a tuple with the title and text of one article
 # Title will always be handler._pages[0] and content will be handler._pages[1]
 # Thus pages[0] should be 'from' and [pages[1]...] 'to' (list of 'hits')
 
-import mwparserfromhell
 
 # Create the wiki article
 wiki_page = mwparserfromhell.parse(handler._pages[1][1])
