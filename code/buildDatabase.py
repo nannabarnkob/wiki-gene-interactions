@@ -71,7 +71,7 @@ class BuildDataBase:
         if method == 'bloom':
             handler = WikiXmlHandler(self.process_article_with_bloom,  wikipath)
         elif method == 'set':
-            print(self.safeGenes)
+            #print(self.safeGenes)
             handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath)
 
         # Parsing object
@@ -108,8 +108,7 @@ class BuildDataBase:
         """Process a wikipedia article with set look-up"""
 
         if title in self.safeGenes:
-            print("Got", title, "which was found in set")
-            pdb.set_trace()
+            #print("Got", title, "which was found in set")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -120,12 +119,14 @@ class BuildDataBase:
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
             #print("Some links in this article", title, ":", passed_links)
 
+            return passed_links
+
 
 
 database = BuildDataBase()
 database.main()
 
-data_path = '/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
+data_path = '/users/kth/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
 #handler = database.process_wiki(data_path, method='bloom')
 handler = database.process_wiki(data_path, method='set')
 
