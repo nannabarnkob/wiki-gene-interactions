@@ -57,8 +57,10 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
             if passed_links:
                 self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
-                selection = self.cursor.execute("SELECT * FROM gene_interactions WHERE symbol = 'BRCA1'").fetchall()
-                print(selection)
+
+
+                #selection = self.cursor.execute("SELECT * FROM gene_interactions WHERE symbol = 'BRCA1'").fetchall()
+                #print(selection)
                 # reorganizer
                 # update database
 

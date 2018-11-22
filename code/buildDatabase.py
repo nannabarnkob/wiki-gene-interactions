@@ -127,4 +127,5 @@ database.main()
 data_path = '/Users/michelle/Desktop/enwiki-20181101-pages-articles-multistream.xml.bz2'
 #handler = database.process_wiki(data_path, method='bloom')
 handler = database.process_wiki(data_path, method='set')
+# test 
 
