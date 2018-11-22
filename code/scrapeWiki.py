@@ -31,9 +31,9 @@ class ScrapeWiki:
 
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor)
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor,db)
         elif method == 'set':
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor,db)
 
         # Parsing object
         parser = xml.sax.make_parser()
@@ -80,6 +80,9 @@ class ScrapeWiki:
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
             #print("Some links in this article", title, ":", passed_links)
             return passed_links
+
+
+
 
 
 data_path = '/users/kth/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'

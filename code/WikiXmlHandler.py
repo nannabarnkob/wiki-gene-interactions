@@ -2,9 +2,11 @@
 import xml.sax
 import datetime
 
+
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
     """Content handler for Wiki XML data using SAX"""
-    def __init__(self, callback, filename, cursor):
+
+    def __init__(self, callback, filename, cursor, db):
         xml.sax.handler.ContentHandler.__init__(self)
         self._buffer = None
         self._article_count = 0
@@ -23,6 +25,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self.starttime = datetime.datetime.now()
 
         self.cursor = cursor
+        self.db = db
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -35,22 +38,21 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             self._current_tag = name
             self._buffer = []
 
-
     def endElement(self, name):
         """Closing tag of element"""
         if name == self._current_tag:
             # join together the content of
             self._values[name] = ' '.join(self._buffer)
 
-
         if name == 'page':
             # there is no reason for saving the pages in the object so following is commented out
-            #self._pages.append((self._values['title'], self._values['text']))
+            # self._pages.append((self._values['title'], self._values['text']))
             self._article_count += 1
 
             if self._article_count % 10000 == 0:
                 now = datetime.datetime.now()
-                self.fh_log.write("Processed " + str(self._article_count) + " articles in " + str(now - self.starttime) + '\n')
+                self.fh_log.write(
+                    "Processed " + str(self._article_count) + " articles in " + str(now - self.starttime) + '\n')
 
             # use callback to process 'found' page
             passed_links = self.callback(**self._values)
@@ -58,17 +60,43 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             if passed_links:
                 self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
 
+                self.add_interactions(passed_links)
 
-                #selection = self.cursor.execute("SELECT * FROM gene_interactions WHERE symbol = 'BRCA1'").fetchall()
-                #print(selection)
-                # reorganizer
-                # update database
+    def add_interactions(self, passed_links):
 
+        # Main gene which has interactions
+        main_gene = self._values['title']
 
+        # Find gene symbols for main gene if it's an alias
+        main_gene_symbols = self.cursor.execute(
+            "SELECT DISTINCT gene_symbol FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+            (main_gene, main_gene)).fetchall()
 
+        # Unique values of passed_links
+        uniq_passed_links = set(passed_links)
 
+        # For each gene symbol in all gene symbols coming from the passed_links
+        for gene_symbol in main_gene_symbols:
 
+            # For each link in (unique)passed_links i.e. interactions
+            for link in uniq_passed_links:
 
+                # If an interaction is an alias - find its symbol
+                interaction_symbols = self.cursor.execute(
+                    "SELECT DISTINCT gene_symbol FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+                    (link, link)).fetchall()
 
+                # For each symbol of an interaction
+                for interaction in interaction_symbols:
 
+                    # Extract the string from gene_symbol
+                    gs = gene_symbol[0]
 
+                    # We wish not to insert a gene and itself as an interaction
+                    if gs != interaction[0]:
+
+                        # Insert if the row does'nt already exist
+                        self.cursor.execute(
+                            "INSERT INTO interactions SELECT ?1,?2,?3,?4 WHERE NOT EXISTS(SELECT 1 FROM interactions WHERE gene_alias = ?1 AND gene_symbol = ?2 AND gene_interaction_alias = ?3 AND gene_interaction_symbol = ?4)",
+                            (main_gene, gs, link, interaction[0]))
+                self.db.commit()
