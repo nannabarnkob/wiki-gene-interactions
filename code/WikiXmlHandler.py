@@ -4,9 +4,14 @@ import datetime
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
-    """Content handler for Wiki XML data using SAX"""
+    """
+    Content handler for Wiki XML data using SAX
+    This class also needs callback function for how to process each wikipedia page and a means of communication with the 
+    database where output from 'scraping' is stored 
+    """
 
-    def __init__(self, callback, filename, cursor, db):
+
+    def __init__(self, callback, filename, cursor, db, log=False):
         xml.sax.handler.ContentHandler.__init__(self)
         self._buffer = None
         self._article_count = 0
@@ -15,14 +20,16 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self._pages = []
         self.callback = callback
         filename = filename.split('/')[-1]
-        # write to log file
-        timestamp = str(datetime.datetime.now().time())
-        interactions_name = "interactions_" + timestamp + filename + ".txt"
-        self.fh_interactions = open(interactions_name, "a")
-        log_name = "log_" + timestamp + filename + ".txt"
-        self.fh_log = open(log_name, "a")
 
-        self.starttime = datetime.datetime.now()
+        self.log = log
+        # write to log file
+        if self.log==True:
+            timestamp = str(datetime.datetime.now().time())
+            interactions_name = "interactions_" + timestamp + filename + ".txt"
+            self.fh_interactions = open(interactions_name, "a")
+            log_name = "log_" + timestamp + filename + ".txt"
+            self.fh_log = open(log_name, "a")
+            self.starttime = datetime.datetime.now()
 
         self.cursor = cursor
         self.db = db
@@ -45,21 +52,20 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             self._values[name] = ' '.join(self._buffer)
 
         if name == 'page':
-            # there is no reason for saving the pages in the object so following is commented out
-            # self._pages.append((self._values['title'], self._values['text']))
             self._article_count += 1
 
-            if self._article_count % 10000 == 0:
-                now = datetime.datetime.now()
-                self.fh_log.write(
-                    "Processed " + str(self._article_count) + " articles in " + str(now - self.starttime) + '\n')
+            if self.log:
+                if self._article_count % 10000 == 0:
+                    now = datetime.datetime.now()
+                    self.fh_log.write(
+                        "Processed " + str(self._article_count) + " articles in " + str(now - self.starttime) + '\n')
 
             # use callback to process 'found' page
             passed_links = self.callback(**self._values)
 
             if passed_links:
-                self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
-
+                if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
+                # add interactions to the database
                 self.add_interactions(passed_links)
 
     def add_interactions(self, passed_links):

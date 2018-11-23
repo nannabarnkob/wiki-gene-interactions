@@ -17,31 +17,45 @@ class geneInfo:
     def arg_parser(self):
         # build argument parser
         parser = argparse.ArgumentParser(
-            description='Get interactions for a wanted gene')
+            description='Get and visualize interactions for a wanted gene. '
+                        'Example usage: ./main.py --gene-name DNAH8 --visualize -output_format image')
         parser.add_argument('-gene', '--gene-name', type=str, help='The gene which interactions is wanted')
         parser.add_argument('-viz', '--visualize', action='store_true', help='Whether or not you want to build a graph visualization from the interaction network')
         parser.add_argument('-output_format', '--output-format', type=str, default='image', help="The format of your graph, choices are image and d3")
         parser.add_argument('-output_method', '--output-method', type=str, default='display', help='Whether you want to visualize the graph as pop-up or save it for later')
         parser.add_argument('-output_name', '--output-name', type=str, default="gene_name_" + "interactions")
+        parser.add_argument('-levels', type=int,default=1,help="Number of neighboring genes you wish to include in the visualization")
 
         self.args = parser.parse_args()
 
     def connect_to_database(self):
-        db = sqlite3.connect('gene-database')
+        db = sqlite3.connect('newTestDB')
         self.cursor = db.cursor()
 
-    def get_interactions(self):
+    def get_interactions(self, gene_name):
+        """ Returns interaction partners for gene query """
         interactions = self.cursor.execute(
-            'select aliases from gene_interactions where symbol = ?', (self.args.gene_name, )).fetchone()[0]
-        # interactions should be a list of tuples
-        return [('BRCA1', 'NFL'), ('NFL', 'BMX')]
+            'select gene_symbol, gene_interaction_symbol from interactions where trim(gene_symbol) = ?', (gene_name, )).fetchall()
+        # interactions is a list of tuples
+        return interactions
+
+    def find_all_interactions(self):
+        self.all_interactions = self.get_interactions(self.args.gene_name)
+        for i in range(self.args.levels):
+            neighbors = [neighbor[1] for neighbor in self.all_interactions]
+            for neighbor in neighbors:
+                neighbor_interaction = self.get_interactions(neighbor)
+                self.all_interactions.extend(neighbor_interaction)
 
     def visualize(self, format='image'):
         G = nx.DiGraph()
+        # flatten all interactions
+
         # first build graphs
-        for interaction in self.get_interactions():
+        for interaction in self.all_interactions:
             G.add_edge(interaction[0], interaction[1])
         if format == 'image':
+            print("Visualizing using networkx")
             nx.draw(G, with_labels=True, font_weight='bold')
             if self.args.output_method == 'display':
                 plt.show()
@@ -58,7 +72,7 @@ class geneInfo:
         print("Got the following arguments:")
         # print namespace
         print(self.args)
-        self.get_interactions()
+        self.find_all_interactions()
         if self.args.visualize:
             self.visualize(format=self.args.output_format)
 
