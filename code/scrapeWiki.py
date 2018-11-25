@@ -18,7 +18,7 @@ class ScrapeWiki:
         #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
 
     def load_safegenes(self):
-        with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
+        with open('../data/gene_symbol_list.txt', 'r') as safeGenesFile:
             self.safeGenes = set()
             for line in safeGenesFile:
                 line = line.strip()
@@ -26,14 +26,14 @@ class ScrapeWiki:
 
     def process_wiki(self, wikipath, method='bloom'):
         # establish connection to db that we parse to xml handler
-        db = sqlite3.connect('gene-database')
+        db = sqlite3.connect('newTestDB')
         cursor = db.cursor()
 
         # Object for handling xml, pass on the self.process_article function as how to process each page
         if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor)
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor, db)
         elif method == 'set':
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor, db)
 
         # Parsing object
         parser = xml.sax.make_parser()
@@ -64,7 +64,6 @@ class ScrapeWiki:
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
             return passed_links
 
-
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
 
@@ -82,8 +81,10 @@ class ScrapeWiki:
             return passed_links
 
 
-data_path = '/users/kth/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
+
+
+
+data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
 wikiscraper = ScrapeWiki()
 wikiscraper.main()
 wikiscraper.process_wiki(data_path, method='set')
-

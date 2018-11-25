@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from BloomFunctions import BloomFunctions
 from WikiXmlHandler import WikiXmlHandler
@@ -9,45 +9,52 @@ import mwparserfromhell
 import argparse
 import datetime
 import os
-from multiprocessing import Pool
-import dill
 import pathos.multiprocessing as mp
 
-import sys
-
-
-class ScrapeWiki:
-    def __init__(self, wikifolder):
-        self.partitions = [wikifolder + x for x in os.listdir(wikifolder)]
+class ScrapeWikiParallelized:
+    def __init__(self):
+        self.arg_parser()
+        print("Running with the following settings:")
+        print(self.args)
+        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)]
         self._finished_count = 0
-        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
+
+    def arg_parser(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-db', '--database', help="Input a database name and file containing data")
+        parser.add_argument('-partition_folder', help="Input folder containing Wikipedia partition files")
+        parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
+        parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')
+        self.args = parser.parse_args()
 
     def main(self):
-        self.load_safegenes()
+        if self.args.method == 'bloom':
+            self.bloomfilter = BloomFunctions(self.args.safe_genes)
+        if self.args.method == 'set':
+            self.load_safegenes()
+        self.parallelize()
 
     def load_safegenes(self):
-        with open('../data/gene_symbol_list.txt','r') as safeGenesFile:
+        with open(self.args.safe_genes,'r') as safeGenesFile:
             self.safeGenes = set()
             for line in safeGenesFile:
                 line = line.strip()
                 self.safeGenes.add(line)
 
-
-    def process_wiki(self, wikipath, method='set'):
+    def process_wiki(self, wikipath):
         # establish connection to db that we parse to xml handler
-        db = sqlite3.connect('gene-database')
+        db = sqlite3.connect(self.args.db)
         cursor = db.cursor()
 
         # Object for handling xml, pass on the self.process_article function as how to process each page
-        if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor)
-        elif method == 'set':
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor)
+        if self.args.method == 'bloom':
+            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor, db)
+        elif self.args.method == 'set':
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor, db)
 
         # Parsing object
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
-
 
         # Iterate through compressed file one line at a time
         print("Begin reading in Wiki at", datetime.datetime.now())
@@ -62,6 +69,7 @@ class ScrapeWiki:
         print("Now finished", self._finished_count, "jobs")
 
     def parallelize(self):
+        """ Method for running process wiki in parallel """
         # Create a pool of workers to execute processes
         pool = mp.Pool(processes=4)
 
@@ -80,17 +88,15 @@ class ScrapeWiki:
             # Find the wikilinks
             wikilinks = [x.title.strip_code().strip()
                          for x in wikicode.filter_wikilinks()]
-
-            #passed_links = [str(x) for x in wikilinks if self.bloomfilter.classify(str(x))]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
-
 
             return passed_links
 
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
 
+        # check if in set of safe genes
         if title in self.safeGenes:
             print("Got", title, "which was found in set")
             # Create a parsing object
@@ -101,16 +107,16 @@ class ScrapeWiki:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
-            #print("Some links in this article", title, ":", passed_links)
-
-            # indsæt i return
-            # self.db = sqlite3.connect('gene-database')
-            # self.cursor = self.db.cursor()
-            # selection = self.cursor.execute("SELECT * FROM gene_interactions WHERE symbol = 'BRCA1'").fetchall()
-            # print(selection)
 
             return passed_links
 
+if __name__ == '__main__':
+    print("### Running WikiScraper ### ")
+    start_time = datetime.datetime.now()
+    wikiscraper = ScrapeWikiParallelized()
+    wikiscraper.main()
+    finish_time = datetime.datetime.now()
+    print("### Finished reading through Wiki in", finish_time-start_time)
 
 wikifolder = '/Users/michelle/Desktop/Wikipedia_partitions/'
 wikiscraper = ScrapeWiki(wikifolder)
