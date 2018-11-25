@@ -26,7 +26,8 @@ class ScrapeWiki:
 
     def process_wiki(self, wikipath, method='bloom'):
         # establish connection to db that we parse to xml handler
-        db = sqlite3.connect('newTestDB')
+        #db = sqlite3.connect('newTestDB')
+        db = sqlite3.connect('geneDB-kth')
         cursor = db.cursor()
 
         # Object for handling xml, pass on the self.process_article function as how to process each page
@@ -84,7 +85,7 @@ class ScrapeWiki:
 
 
 
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
+data_path = '/users/kth/Wiki/enwiki-20181101-pages-articles-multistream.xml.bz2'
 wikiscraper = ScrapeWiki()
 wikiscraper.main()
 wikiscraper.process_wiki(data_path, method='set')

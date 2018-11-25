@@ -11,9 +11,6 @@ class BuildDataBase:
     def main(self):
         self.arg_parser()
         self.make_database()
-        #self.load_safegenes()
-        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
-
 
     def arg_parser(self):
         parser = argparse.ArgumentParser()
