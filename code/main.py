@@ -20,6 +20,7 @@ class geneInfo:
             description='Get and visualize interactions for a wanted gene. '
                         'Example usage: ./main.py --gene-name DNAH8 --visualize -output_format image')
         parser.add_argument('-gene', '--gene-name', type=str, help='The gene which interactions is wanted')
+        parser.add_argument('-interactions', action='store_true', help='Whether or not you want to see the interactions for the gene')
         parser.add_argument('-viz', '--visualize', action='store_true', help='Whether or not you want to build a graph visualization from the interaction network')
         parser.add_argument('-output_format', '--output-format', type=str, default='image', help="The format of your graph, choices are image and d3")
         parser.add_argument('-output_method', '--output-method', type=str, default='display', help='Whether you want to visualize the graph as pop-up or save it for later')
@@ -39,8 +40,14 @@ class geneInfo:
         # interactions is a list of tuples
         return interactions
 
-    def print_interactions(self):
-        pass
+    def print_interactions(self, gene_name):
+        
+        interactionsList = []
+                        
+        for line in self.get_interactions(gene_name):
+            interactionsList.append(line[1])
+                            
+        print(interactionsList)
 
     def find_all_interactions(self):
         self.all_interactions = self.get_interactions(self.args.gene_name)
@@ -75,7 +82,8 @@ class geneInfo:
         # print namespace for args:
         print("Got arguments:", self.args)
         self.find_all_interactions()
-        self.print_interactions()
+        if self.args.interactions:
+            self.print_interactions(self.args.gene_name)
         if self.args.visualize:
             self.visualize(format=self.args.output_format)
 
