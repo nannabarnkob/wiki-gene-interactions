@@ -78,6 +78,8 @@ class ScrapeWikiParallelized:
 
         self._finished_count += 1
         print("Now finished", self._finished_count, "jobs")
+        self._wrong_titles_total += handler._count_wrong_titles
+        self._wrong_interactions += handler._count_wrong_interactions
 
     def parallelize(self):
         """ Method for running process wiki in parallel """
@@ -127,8 +129,6 @@ if __name__ == '__main__':
     wikiscraper.main()
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
-
-wikifolder = '/Users/michelle/Desktop/Wikipedia_partitions/'
-wikiscraper = ScrapeWiki(wikifolder)
-wikiscraper.main()
-wikiscraper.parallelize()
+    print("Stats: \n",
+          "Total wrong titles:", wikiscraper._wrong_titles_total)
+    print("Total wrong interactions:", wikiscraper._wrong_interactions)
