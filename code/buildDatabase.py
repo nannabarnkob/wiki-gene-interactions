@@ -11,9 +11,6 @@ class BuildDataBase:
     def main(self):
         self.arg_parser()
         self.make_database()
-        #self.load_safegenes()
-        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
-
 
     def arg_parser(self):
         parser = argparse.ArgumentParser()
@@ -76,6 +73,8 @@ class BuildDataBase:
             self.cursor.executemany("INSERT OR REPLACE INTO gene_interactions(geneID, symbol, aliases) VALUES (?,?,?)", allData)
             self.db.commit()
 
-database = BuildDataBase()
-database.main()
+if __name__ == "__main__":
+    print("### Now building database and loading known data ###")
+    database = BuildDataBase()
+    database.main()
 
