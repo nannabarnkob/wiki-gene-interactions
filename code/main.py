@@ -82,6 +82,7 @@ class geneInfo:
                 plt.savefig(self.args.output_name+ ".png")
         elif format == 'd3':
             print("Visualizing using D3")
+            print("Use ctrl+c to quit")
             visualize(G)
 
 

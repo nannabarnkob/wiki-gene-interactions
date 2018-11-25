@@ -83,7 +83,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         main_gene_symbols = self.cursor.execute(
             "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
-        print(main_gene_symbols)
         if main_gene_symbols[0][0] == 0:
             self._count_wrong_titles += 1
             return
