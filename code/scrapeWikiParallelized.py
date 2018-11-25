@@ -128,3 +128,7 @@ if __name__ == '__main__':
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
 
+wikifolder = '/Users/michelle/Desktop/Wikipedia_partitions/'
+wikiscraper = ScrapeWiki(wikifolder)
+wikiscraper.main()
+wikiscraper.parallelize()

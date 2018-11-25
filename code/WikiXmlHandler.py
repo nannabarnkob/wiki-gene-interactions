@@ -33,6 +33,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         self.cursor = cursor
         self.db = db
+        self._count_wrong_titles = 0
+        self._count_wrong_interactions = 0
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -66,17 +68,25 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             if passed_links:
                 if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
                 # add interactions to the database
+
                 self.add_interactions(passed_links)
+
 
     def add_interactions(self, passed_links):
 
         # Main gene which has interactions
         main_gene = self._values['title']
 
+
+
         # Find gene symbols for main gene if it's an alias
         main_gene_symbols = self.cursor.execute(
-            "SELECT DISTINCT gene_symbol FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+            "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
+        print(main_gene_symbols)
+        if main_gene_symbols[0][0] == 0:
+            self._count_wrong_titles += 1
+            return
 
 
         # Unique values of passed_links
@@ -90,8 +100,13 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
                 # If an interaction is an alias - find its symbol
                 interaction_symbols = self.cursor.execute(
-                    "SELECT DISTINCT gene_symbol FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+                    "SELECT DISTINCT CASE WHEN  COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
                     (link, link)).fetchall()
+
+
+                if interaction_symbols[0][0] == 0:
+                    self._count_wrong_interactions += 1
+                    continue
 
                 # For each symbol of an interaction
                 for interaction in interaction_symbols:

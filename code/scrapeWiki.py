@@ -108,4 +108,3 @@ if __name__ == '__main__':
     wikiscraper.main()
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
-
