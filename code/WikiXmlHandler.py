@@ -78,6 +78,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             "SELECT DISTINCT gene_symbol FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
 
+
         # Unique values of passed_links
         uniq_passed_links = set(passed_links)
 

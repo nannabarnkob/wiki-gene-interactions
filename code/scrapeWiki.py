@@ -1,21 +1,45 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from BloomFunctions import BloomFunctions
 from WikiXmlHandler import WikiXmlHandler
 import sqlite3
-import unicodecsv
 import argparse
 import xml.sax
+import os
 import subprocess
 import mwparserfromhell
 import datetime
-import pdb
 
 
 class ScrapeWiki:
+    def __init__(self):
+        self.arg_parser()
+        print("Running with the following settings:")
+        print(self.args)
+
+    def arg_parser(self):
+        parser = argparse.ArgumentParser(
+            description='Find gene interactions based on Wikipedia file'
+                        'Example usage: ./scrapeWiki.py -db newtestDB -wikipath "/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2" -safe_genes "../data/gene_symbol_list.txt" -method bloom -log')
+        parser.add_argument('-db', '--database', help="Input a database name and file containing data")
+        parser.add_argument('-wikipath', help="Wikipedia file (format bz-compressed XML")
+        parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
+        parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')
+        parser.add_argument('-log', action='store_true',
+                            help='Whether or not you want to produce log files from the scraping process')
+        self.args = parser.parse_args()
+
+        # check args
+        assert os.path.exists(self.args.wikipath), print("Error: Wikipedia file does not exist. Please input correct path")
+        assert os.path.exists(self.args.database), print("Error: Database not found. Please input correct database path")
+        assert self.args.method == 'bloom' or self.args.method == 'set', print("Choose either method 'set' or 'bloom'")
+
     def main(self):
-        self.load_safegenes()
-        #self.bloomfilter = BloomFunctions('../data/gene_symbol_list.txt')
+        if self.args.method == 'bloom':
+            self.bloomfilter = BloomFunctions(self.args.safe_genes)
+        if self.args.method == 'set':
+            self.load_safegenes()
+        self.process_wiki()
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt', 'r') as safeGenesFile:
@@ -24,16 +48,16 @@ class ScrapeWiki:
                 line = line.strip()
                 self.safeGenes.add(line)
 
-    def process_wiki(self, wikipath, method='bloom'):
+    def process_wiki(self):
         # establish connection to db that we parse to xml handler
-        db = sqlite3.connect('newTestDB')
+        db = sqlite3.connect(self.args.database)
         cursor = db.cursor()
 
-        # Object for handling xml, pass on the self.process_article function as how to process each page
-        if method == 'bloom':
-            handler = WikiXmlHandler(self.process_article_with_bloom, wikipath, cursor, db)
-        elif method == 'set':
-            handler = WikiXmlHandler(self.process_article_with_set_lookup, wikipath, cursor, db)
+        # Object for handling xml, pass on the self.process_article_X function as how to process each page
+        if self.args.method == 'bloom':
+            handler = WikiXmlHandler(self.process_article_with_bloom, self.args.wikipath, cursor, db, self.args.log)
+        elif self.args.method == 'set':
+            handler = WikiXmlHandler(self.process_article_with_set_lookup, self.args.wikipath, cursor, db, self.args.log)
 
         # Parsing object
         parser = xml.sax.make_parser()
@@ -42,7 +66,7 @@ class ScrapeWiki:
         # Iterate through compressed file one line at a time
         print("Begin reading in Wiki at", datetime.datetime.now())
         for line in subprocess.Popen(['bzcat'],
-                                     stdin=open(data_path),
+                                     stdin=open(self.args.wikipath),
                                      stdout=subprocess.PIPE).stdout:
             parser.feed(line)
 
@@ -59,7 +83,6 @@ class ScrapeWiki:
             wikilinks = [x.title.strip_code().strip()
                          for x in wikicode.filter_wikilinks()]
 
-            #passed_links = [str(x) for x in wikilinks if self.bloomfilter.classify(str(x))]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
             return passed_links
@@ -68,7 +91,6 @@ class ScrapeWiki:
         """Process a wikipedia article with set look-up"""
 
         if title in self.safeGenes:
-            #print("Got", title, "which was found in set")
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
 
@@ -77,14 +99,13 @@ class ScrapeWiki:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
-            #print("Some links in this article", title, ":", passed_links)
             return passed_links
 
+if __name__ == '__main__':
+    print("### Running WikiScraper ### ")
+    start_time = datetime.datetime.now()
+    wikiscraper = ScrapeWiki()
+    wikiscraper.main()
+    finish_time = datetime.datetime.now()
+    print("### Finished reading through Wiki in", finish_time-start_time)
 
-
-
-
-data_path = '/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2'
-wikiscraper = ScrapeWiki()
-wikiscraper.main()
-wikiscraper.process_wiki(data_path, method='set')
