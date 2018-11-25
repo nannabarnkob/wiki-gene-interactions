@@ -12,6 +12,9 @@ import sqlite3
 import matplotlib.pyplot as plt
 import networkx as nx
 from netwulf import visualize
+import pygraphviz
+#import pydot
+from networkx.drawing.nx_pydot import graphviz_layout
 
 class geneInfo:
     def arg_parser(self):
@@ -29,9 +32,11 @@ class geneInfo:
 
         self.args = parser.parse_args()
 
+
     def connect_to_database(self):
         db = sqlite3.connect('newTestDB')
         self.cursor = db.cursor()
+
 
     def get_interactions(self, gene_name):
         """ Returns interaction partners for gene query """
@@ -39,6 +44,7 @@ class geneInfo:
             'select gene_symbol, gene_interaction_symbol from interactions where trim(gene_symbol) = ?', (gene_name, )).fetchall()
         # interactions is a list of tuples
         return interactions
+
 
     def print_interactions(self, gene_name):
         
@@ -49,13 +55,15 @@ class geneInfo:
                             
         print(interactionsList)
 
+
     def find_all_interactions(self):
         self.all_interactions = self.get_interactions(self.args.gene_name)
-        for i in range(self.args.levels):
-            neighbors = [neighbor[1] for neighbor in self.all_interactions]
-            for neighbor in neighbors:
-                neighbor_interaction = self.get_interactions(neighbor)
-                self.all_interactions.extend(neighbor_interaction)
+        if self.args.levels > 1:
+            for i in range(self.args.levels-1):
+                neighbors = [neighbor[1] for neighbor in self.all_interactions]
+                for neighbor in neighbors:
+                    neighbor_interaction = self.get_interactions(neighbor)
+                    self.all_interactions.extend(neighbor_interaction)
 
     def visualize(self, format='image'):
         G = nx.DiGraph()
@@ -66,7 +74,8 @@ class geneInfo:
             G.add_edge(interaction[0], interaction[1])
         if format == 'image':
             print("Visualizing using networkx")
-            nx.draw(G, with_labels=True, font_weight='bold')
+            nlayout = graphviz_layout(G, prog="neato")
+            nx.draw(G, nlayout, with_labels=True, font_weight='bold')
             if self.args.output_method == 'display':
                 plt.show()
             elif self.args.output_format == 'save':
