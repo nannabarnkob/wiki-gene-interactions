@@ -16,8 +16,7 @@ class ScrapeWikiParallelized:
         self.arg_parser()
         print("Running with the following settings:")
         print(self.args)
-        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)]
-        self._finished_count = 0
+        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)][0:4]
 
     def arg_parser(self):
         parser = argparse.ArgumentParser(
@@ -44,6 +43,7 @@ class ScrapeWikiParallelized:
         if self.args.method == 'set':
             self.load_safegenes()
         self.parallelize()
+        self.get_wrong_genenames()
 
     def load_safegenes(self):
         with open(self.args.safe_genes,'r') as safeGenesFile:
@@ -68,18 +68,14 @@ class ScrapeWikiParallelized:
         parser.setContentHandler(handler)
 
         # Iterate through compressed file one line at a time
-        print("Begin reading in Wiki at", datetime.datetime.now())
+        print("Begin reading in Wiki", wikipath, "at", datetime.datetime.now())
         for line in subprocess.Popen(['bzcat'],
                                      stdin=open(wikipath),
                                      stdout=subprocess.PIPE).stdout:
             parser.feed(line)
 
-        print("End reading in Wiki at", datetime.datetime.now())
-
-        self._finished_count += 1
-        print("Now finished", self._finished_count, "jobs")
-        self._wrong_titles_total += handler._count_wrong_titles
-        self._wrong_interactions += handler._count_wrong_interactions
+        print("End reading Wiki", wikipath, "at", datetime.datetime.now())
+        return (handler._count_wrong_titles, handler._count_wrong_interactions)
 
     def parallelize(self):
         """ Method for running process wiki in parallel """
@@ -87,7 +83,7 @@ class ScrapeWikiParallelized:
         pool = mp.Pool(processes=self.args.nproc)
 
         # Map (service, tasks), applies function to each partition
-        pool.map(self.process_wiki, self.partitions)
+        self.wrong_findings = pool.map(self.process_wiki, self.partitions)
         pool.close()
         pool.join()
 
@@ -122,6 +118,10 @@ class ScrapeWikiParallelized:
 
             return passed_links
 
+    def get_wrong_genenames(self):
+        self.total_wrong_genesymbols = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_interactions = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
+
 if __name__ == '__main__':
     print("### Running WikiScraper in parralelized mode ### ")
     start_time = datetime.datetime.now()
@@ -130,5 +130,5 @@ if __name__ == '__main__':
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
     print("Stats: \n",
-          "Total wrong titles:", wikiscraper._wrong_titles_total)
-    print("Total wrong interactions:", wikiscraper._wrong_interactions)
+          "Total wrong titles:", wikiscraper.total_wrong_genesymbols)
+    print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
