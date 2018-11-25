@@ -39,6 +39,9 @@ class geneInfo:
         # interactions is a list of tuples
         return interactions
 
+    def print_interactions(self):
+        pass
+
     def find_all_interactions(self):
         self.all_interactions = self.get_interactions(self.args.gene_name)
         for i in range(self.args.levels):
@@ -69,10 +72,10 @@ class geneInfo:
     def main(self):
         inter.connect_to_database()
         self.arg_parser()
-        print("Got the following arguments:")
-        # print namespace
-        print(self.args)
+        # print namespace for args:
+        print("Got arguments:", self.args)
         self.find_all_interactions()
+        self.print_interactions()
         if self.args.visualize:
             self.visualize(format=self.args.output_format)
 
