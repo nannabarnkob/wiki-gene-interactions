@@ -112,7 +112,7 @@ class ScrapeWiki:
             return passed_links
 
 
-wikifolder = '/Volumes/Seagate Backup Plus Drive/Wikipedia_partitions/'
+wikifolder = '/Users/michelle/Desktop/Wikipedia_partitions/'
 wikiscraper = ScrapeWiki(wikifolder)
 wikiscraper.main()
 wikiscraper.parallelize()
