@@ -1,7 +1,5 @@
 #! /usr/bin/env python
 
-from BloomFunctions import BloomFunctions
-from WikiXmlHandler import WikiXmlHandler
 import sqlite3
 import argparse
 
@@ -14,8 +12,8 @@ class BuildDataBase:
 
     def arg_parser(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('db', help="Input a database name and file containing data")
-        parser.add_argument('filename', help = 'Input file name of data file')
+        parser.add_argument('-db', help="Input a database name and file containing data")
+        parser.add_argument('-filename', help = 'Input file name of data file')
         self.args = parser.parse_args()
 
 
@@ -74,7 +72,8 @@ class BuildDataBase:
             self.db.commit()
 
 if __name__ == "__main__":
-    print("### Now building database and loading known data ###")
+    print("### Now building database framework and loading known data ###")
     database = BuildDataBase()
     database.main()
+    print("Done!")
 
