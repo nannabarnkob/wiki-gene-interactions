@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import sqlite3
 import argparse
@@ -13,7 +13,7 @@ class BuildDataBase:
     def arg_parser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('-db', help="Input a database name and file containing data")
-        parser.add_argument('-filename', help = 'Input file name of data file')
+        parser.add_argument('-filename', default="../data/id_symbol_alias.txt", help = 'Input file name of data file')
         self.args = parser.parse_args()
 
 

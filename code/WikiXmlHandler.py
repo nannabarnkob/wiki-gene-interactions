@@ -11,7 +11,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
     """
 
 
-    def __init__(self, callback, filename, cursor, db, log=False):
+    def __init__(self, callback, filename, cursor, db, log=False, wrong_titles=0, wrong_interactions=0):
         xml.sax.handler.ContentHandler.__init__(self)
         self._buffer = None
         self._article_count = 0
@@ -33,8 +33,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         self.cursor = cursor
         self.db = db
-        self._count_wrong_titles = 0
-        self._count_wrong_interactions = 0
+        self.wrong_titles = wrong_titles
+        self.wrong_interactions = wrong_interactions
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -83,9 +83,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         main_gene_symbols = self.cursor.execute(
             "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
-        print(main_gene_symbols)
         if main_gene_symbols[0][0] == 0:
-            self._count_wrong_titles += 1
+            self.wrong_titles += 1
             return
 
 
@@ -105,7 +104,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
 
                 if interaction_symbols[0][0] == 0:
-                    self._count_wrong_interactions += 1
+                    self.wrong_interactions += 1
                     continue
 
                 # For each symbol of an interaction
@@ -122,3 +121,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                             "INSERT INTO interactions SELECT ?1,?2,?3,?4 WHERE NOT EXISTS(SELECT 1 FROM interactions WHERE gene_alias = ?1 AND gene_symbol = ?2 AND gene_interaction_alias = ?3 AND gene_interaction_symbol = ?4)",
                             (main_gene, gs, link, interaction[0]))
                 self.db.commit()
+
+    def get_counter(self):
+        return self.wrong_titles, self.wrong_interactions

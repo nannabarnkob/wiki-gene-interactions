@@ -71,8 +71,8 @@ class ScrapeWiki:
             parser.feed(line)
 
         print("End reading in Wiki at", datetime.datetime.now())
-        print("Total wrong titles:", handler._count_wrong_titles)
-        print("Total wrong interactions", handler._count_wrong_interactions)
+        print("Total wrong titles:", handler.wrong_titles)
+        print("Total wrong interactions", handler.wrong_interactions)
 
     def process_article_with_bloom(self, title, text):
         """Process a wikipedia article """

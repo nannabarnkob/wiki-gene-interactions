@@ -16,8 +16,11 @@ class ScrapeWikiParallelized:
         self.arg_parser()
         print("Running with the following settings:")
         print(self.args)
-        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)]
+        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)][0:4]
         self._finished_count = 0
+        self._wrong_titles_total = 0
+        self._wrong_interactions = 0
+
 
     def arg_parser(self):
         parser = argparse.ArgumentParser(
@@ -78,8 +81,10 @@ class ScrapeWikiParallelized:
 
         self._finished_count += 1
         print("Now finished", self._finished_count, "jobs")
+        print(handler._count_wrong_interactions)
         self._wrong_titles_total += handler._count_wrong_titles
         self._wrong_interactions += handler._count_wrong_interactions
+        return 1
 
     def parallelize(self):
         """ Method for running process wiki in parallel """
@@ -129,6 +134,5 @@ if __name__ == '__main__':
     wikiscraper.main()
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
-    print("Stats: \n",
-          "Total wrong titles:", wikiscraper._wrong_titles_total)
+    print("Total wrong titles:", wikiscraper._wrong_titles_total)
     print("Total wrong interactions:", wikiscraper._wrong_interactions)
