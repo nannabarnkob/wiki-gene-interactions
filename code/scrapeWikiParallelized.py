@@ -75,7 +75,7 @@ class ScrapeWikiParallelized:
             parser.feed(line)
 
         print("End reading Wiki", wikipath, "at", datetime.datetime.now())
-        return (handler._count_wrong_titles, handler._count_wrong_interactions)
+        return (handler._article_count, handler._count_wrong_titles, handler._count_wrong_interactions)
 
     def parallelize(self):
         """ Method for running process wiki in parallel """
@@ -119,8 +119,10 @@ class ScrapeWikiParallelized:
             return passed_links
 
     def get_wrong_genenames(self):
-        self.total_wrong_genesymbols = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
-        self.total_wrong_interactions = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
+        self.total_articles = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_genesymbols = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_interactions = sum([tuple_gene_symbols[2] for tuple_gene_symbols in self.wrong_findings])
+
 
 if __name__ == '__main__':
     print("### Running WikiScraper in parralelized mode ### ")
@@ -129,6 +131,7 @@ if __name__ == '__main__':
     wikiscraper.main()
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
-    print("Stats: \n",
-          "Total wrong titles:", wikiscraper.total_wrong_genesymbols)
+    print("Stats:")
+    print("Total wrong titles:", wikiscraper.total_wrong_genesymbols)
     print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
+    print("Total articles", wikiscraper.total_articles)
