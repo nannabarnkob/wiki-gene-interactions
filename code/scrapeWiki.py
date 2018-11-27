@@ -40,6 +40,7 @@ class ScrapeWiki:
         if self.args.method == 'set':
             self.load_safegenes()
         self.process_wiki()
+        self.get_wrong_genenames()
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt', 'r') as safeGenesFile:
