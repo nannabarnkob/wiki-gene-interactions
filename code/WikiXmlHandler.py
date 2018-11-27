@@ -132,3 +132,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                             "INSERT INTO interactions SELECT ?1,?2,?3,?4 WHERE NOT EXISTS(SELECT 1 FROM interactions WHERE gene_alias = ?1 AND gene_symbol = ?2 AND gene_interaction_alias = ?3 AND gene_interaction_symbol = ?4)",
                             (main_gene, gs, link, interaction[0]))
                 self.db.commit()
+
+    def get_counter(self):
+        return self._count_wrong_titles, self._count_wrong_interactions
