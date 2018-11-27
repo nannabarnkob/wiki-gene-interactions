@@ -20,8 +20,8 @@ class ScrapeWiki:
     def arg_parser(self):
         parser = argparse.ArgumentParser(
             description='Find gene interactions based on Wikipedia file'
-                        'Example usage: ./scrapeWiki.py -db newtestDB -wikipath "/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2" -safe_genes "../data/gene_symbol_list.txt" -method bloom -log')
-        parser.add_argument('-db', '--database', help="Input a database name and file containing data")
+                        'Example usage: ./scrapeWiki.py -db gene-database -wikipath "/Volumes/Seagate Backup Plus Drive/Wikipedia/enwiki-20181101-pages-articles-multistream.xml.bz2" -safe_genes "../data/gene_symbol_list.txt" -method bloom -log')
+        parser.add_argument('-db', '--database', default='gene-database', help="Input a database name and file containing data")
         parser.add_argument('-wikipath', help="Wikipedia file (format bz-compressed XML")
         parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
         parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')

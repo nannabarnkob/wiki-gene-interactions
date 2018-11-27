@@ -84,15 +84,24 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
 
-        # check for main symbol
-        not_alias_symbols = self.cursor.execute(
-            "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
-            (main_gene, )).fetchall()
+        if main_gene_symbols[0][0] == 0:
+            # check for main symbol
+            not_alias_symbols = self.cursor.execute(
+                "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+                (main_gene, )).fetchall()
+            if not_alias_symbols[0][0] == 0:
+                self._count_wrong_titles += 1
+                print(main_gene)
+                return
+            else:
+                main_gene_symbols = not_alias_symbols
 
-        if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
-            self._count_wrong_titles += 1
-            print(main_gene)
-            return
+        #if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
+        #    self._count_wrong_titles += 1
+        #    print(main_gene)
+        #    return
+        #elif main_gene_symbols[0][0] is not 0 or not_alias_symbols[0][0] is not 0:
+        #    main_gene_
 
 
         # Unique values of passed_links
@@ -109,14 +118,17 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                     "SELECT DISTINCT CASE WHEN  COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
                     (link, link)).fetchall()
 
-                not_alias_interaction_symbols = self.cursor.execute(
-                    "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
-                    (link,)).fetchall()
 
-                if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
-                    self._count_wrong_interactions += 1
-                    print(link)
-                    continue
+                if interaction_symbols[0][0] == 0:
+                    not_alias_interaction_symbols = self.cursor.execute(
+                        "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+                        (link,)).fetchall()
+                    if not_alias_interaction_symbols[0][0] == 0:
+                        self._count_wrong_interactions += 1
+                        print(link)
+                        continue
+                    else:
+                        interaction_symbols = not_alias_interaction_symbols
 
                 # For each symbol of an interaction
                 for interaction in interaction_symbols:

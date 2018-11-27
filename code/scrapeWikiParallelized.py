@@ -16,13 +16,13 @@ class ScrapeWikiParallelized:
         self.arg_parser()
         print("Running with the following settings:")
         print(self.args)
-        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)][0:4]
+        self.partitions = [self.args.partition_folder + x for x in os.listdir(self.args.partition_folder)]
 
     def arg_parser(self):
         parser = argparse.ArgumentParser(
             description='Find gene interactions based on partitioned Wikipedia file'
                         'Example usage: ./scrapeWikiParralelized.py -db newtestDB -partition_folder "/Volumes/Seagate Backup Plus Drive/Wikipedia_partitions" -safe_genes "../data/gene_symbol_list.txt" -method bloom -log')
-        parser.add_argument('-db', '--database', help="Input a database name and file containing data")
+        parser.add_argument('-db', '--database', default='gene-database', help="Input a database name and file containing data")
         parser.add_argument('-partition_folder', help="Input folder containing Wikipedia partition files")
         parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
         parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')
