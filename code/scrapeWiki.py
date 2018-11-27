@@ -71,8 +71,8 @@ class ScrapeWiki:
             parser.feed(line)
 
         print("End reading in Wiki at", datetime.datetime.now())
-        print("Total wrong titles:", handler.wrong_titles)
-        print("Total wrong interactions", handler.wrong_interactions)
+        return (handler._article_count, handler._count_wrong_titles, handler._count_wrong_interactions)
+
 
     def process_article_with_bloom(self, title, text):
         """Process a wikipedia article """
@@ -103,6 +103,11 @@ class ScrapeWiki:
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
             return passed_links
 
+    def get_wrong_genenames(self):
+        self.total_articles = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_genesymbols = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_interactions = sum([tuple_gene_symbols[2] for tuple_gene_symbols in self.wrong_findings])
+
 if __name__ == '__main__':
     print("### Running WikiScraper ### ")
     start_time = datetime.datetime.now()
@@ -110,3 +115,8 @@ if __name__ == '__main__':
     wikiscraper.main()
     finish_time = datetime.datetime.now()
     print("### Finished reading through Wiki in", finish_time-start_time)
+    print("Stats:")
+    print("Total wrong titles:", wikiscraper.total_wrong_genesymbols)
+    print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
+    print("Total articles", wikiscraper.total_articles)
+

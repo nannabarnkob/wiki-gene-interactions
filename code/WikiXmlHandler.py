@@ -11,7 +11,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
     """
 
 
-    def __init__(self, callback, filename, cursor, db, log=False, wrong_titles=0, wrong_interactions=0):
+    def __init__(self, callback, filename, cursor, db, log=False):
         xml.sax.handler.ContentHandler.__init__(self)
         self._buffer = None
         self._article_count = 0
@@ -33,8 +33,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         self.cursor = cursor
         self.db = db
-        self.wrong_titles = wrong_titles
-        self.wrong_interactions = wrong_interactions
+        self._count_wrong_titles = 0
+        self._count_wrong_interactions = 0
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -83,8 +83,15 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         main_gene_symbols = self.cursor.execute(
             "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
-        if main_gene_symbols[0][0] == 0:
-            self.wrong_titles += 1
+
+        # check for main symbol
+        not_alias_symbols = self.cursor.execute(
+            "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+            (main_gene, )).fetchall()
+
+        if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
+            self._count_wrong_titles += 1
+            print(main_gene)
             return
 
 
@@ -102,9 +109,13 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                     "SELECT DISTINCT CASE WHEN  COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
                     (link, link)).fetchall()
 
+                not_alias_interaction_symbols = self.cursor.execute(
+                    "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+                    (link,)).fetchall()
 
-                if interaction_symbols[0][0] == 0:
-                    self.wrong_interactions += 1
+                if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
+                    self._count_wrong_interactions += 1
+                    print(link)
                     continue
 
                 # For each symbol of an interaction
@@ -123,4 +134,4 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                 self.db.commit()
 
     def get_counter(self):
-        return self.wrong_titles, self.wrong_interactions
+        return self._count_wrong_titles, self._count_wrong_interactions
