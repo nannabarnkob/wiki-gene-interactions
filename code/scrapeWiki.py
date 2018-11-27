@@ -39,8 +39,7 @@ class ScrapeWiki:
             self.bloomfilter = BloomFunctions(self.args.safe_genes)
         if self.args.method == 'set':
             self.load_safegenes()
-        self.process_wiki()
-        self.get_wrong_genenames()
+        self.total_articles, self.total_wrong_genesymbols, self.total_wrong_interactions = self.process_wiki()
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt', 'r') as safeGenesFile:
@@ -104,10 +103,6 @@ class ScrapeWiki:
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
             return passed_links
 
-    def get_wrong_genenames(self):
-        self.total_articles = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
-        self.total_wrong_genesymbols = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
-        self.total_wrong_interactions = sum([tuple_gene_symbols[2] for tuple_gene_symbols in self.wrong_findings])
 
 if __name__ == '__main__':
     print("### Running WikiScraper ### ")
