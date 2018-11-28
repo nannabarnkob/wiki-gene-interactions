@@ -75,7 +75,8 @@ class ScrapeWikiParallelized:
             parser.feed(line)
 
         print("End reading Wiki", wikipath, "at", datetime.datetime.now())
-        return (handler._article_count, handler._count_wrong_titles, handler._count_wrong_interactions)
+        return (handler._article_count, handler._count_raw_links, handler._count_wrong_titles,
+                handler._count_wrong_interactions)
 
     def parallelize(self):
         """ Method for running process wiki in parallel """
@@ -97,15 +98,14 @@ class ScrapeWikiParallelized:
             # Find the wikilinks
             wikilinks = [x.title.strip_code().strip()
                          for x in wikicode.filter_wikilinks()]
+
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
-
-            return passed_links
+            return (len(wikilinks), passed_links)
 
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
 
-        # check if in set of safe genes
         if title in self.safeGenes:
             # Create a parsing object
             wikicode = mwparserfromhell.parse(text)
@@ -115,13 +115,14 @@ class ScrapeWikiParallelized:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
+            return (len(wikilinks), passed_links)
 
-            return passed_links
 
     def get_wrong_genenames(self):
         self.total_articles = sum([tuple_gene_symbols[0] for tuple_gene_symbols in self.wrong_findings])
-        self.total_wrong_genesymbols = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
-        self.total_wrong_interactions = sum([tuple_gene_symbols[2] for tuple_gene_symbols in self.wrong_findings])
+        self.total_links = sum([tuple_gene_symbols[1] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_genesymbols = sum([tuple_gene_symbols[2] for tuple_gene_symbols in self.wrong_findings])
+        self.total_wrong_interactions = sum([tuple_gene_symbols[3] for tuple_gene_symbols in self.wrong_findings])
 
 
 if __name__ == '__main__':
@@ -134,4 +135,5 @@ if __name__ == '__main__':
     print("Stats:")
     print("Total wrong titles:", wikiscraper.total_wrong_genesymbols)
     print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
+    print("Total links", wikiscraper.total_links)
     print("Total articles", wikiscraper.total_articles)

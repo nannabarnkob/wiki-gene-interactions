@@ -39,7 +39,7 @@ class ScrapeWiki:
             self.bloomfilter = BloomFunctions(self.args.safe_genes)
         if self.args.method == 'set':
             self.load_safegenes()
-        self.total_articles, self.total_wrong_genesymbols, self.total_wrong_interactions = self.process_wiki()
+        self.total_articles, self.total_links, self.total_wrong_genesymbols, self.total_wrong_interactions = self.process_wiki()
 
     def load_safegenes(self):
         with open('../data/gene_symbol_list.txt', 'r') as safeGenesFile:
@@ -71,7 +71,7 @@ class ScrapeWiki:
             parser.feed(line)
 
         print("End reading in Wiki at", datetime.datetime.now())
-        return (handler._article_count, handler._count_wrong_titles, handler._count_wrong_interactions)
+        return (handler._article_count, handler._count_raw_links, handler._count_wrong_titles, handler._count_wrong_interactions)
 
 
     def process_article_with_bloom(self, title, text):
@@ -87,7 +87,7 @@ class ScrapeWiki:
 
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if self.bloomfilter.classify(str(wikilinks[i]))]
-            return passed_links
+            return (len(wikilinks), passed_links)
 
     def process_article_with_set_lookup(self, title, text):
         """Process a wikipedia article with set look-up"""
@@ -101,7 +101,7 @@ class ScrapeWiki:
                          for x in wikicode.filter_wikilinks()]
             passed_links = [wikilinks[i] for i in range(
                 len(wikilinks)) if wikilinks[i] in self.safeGenes]
-            return passed_links
+            return (len(wikilinks), passed_links)
 
 
 if __name__ == '__main__':
@@ -114,5 +114,6 @@ if __name__ == '__main__':
     print("Stats:")
     print("Total wrong titles:", wikiscraper.total_wrong_genesymbols)
     print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
+    print("Total links", wikiscraper.total_links)
     print("Total articles", wikiscraper.total_articles)
 

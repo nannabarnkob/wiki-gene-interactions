@@ -35,6 +35,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self.db = db
         self._count_wrong_titles = 0
         self._count_wrong_interactions = 0
+        self._count_raw_links = 0
+
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -63,12 +65,14 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                         "Processed " + str(self._article_count) + " articles in " + str(now - self.starttime) + '\n')
 
             # use callback to process 'found' page
-            passed_links = self.callback(**self._values)
+            #(raw_link_count, passed_links) = self.callback(**self._values)
+            article_results = self.callback(**self._values)
 
-            if passed_links:
+            if article_results:
                 if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
+                raw_link_count, passed_links = article_results
+                self._count_raw_links += raw_link_count
                 # add interactions to the database
-
                 self.add_interactions(passed_links)
 
 
@@ -95,14 +99,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                 return
             else:
                 main_gene_symbols = not_alias_symbols
-
-        #if main_gene_symbols[0][0] == 0 and not_alias_symbols[0][0] == 0:
-        #    self._count_wrong_titles += 1
-        #    print(main_gene)
-        #    return
-        #elif main_gene_symbols[0][0] is not 0 or not_alias_symbols[0][0] is not 0:
-        #    main_gene_
-
 
         # Unique values of passed_links
         uniq_passed_links = set(passed_links)
