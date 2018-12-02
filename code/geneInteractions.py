@@ -62,58 +62,84 @@ class geneInteractions:
     def print_interactions(self, gene_name, interactions):
         message = [tuple[1] for tuple in interactions]
         if len(message) > 0:
-            print("Interactions for", gene_name + ":\t", message)
+            print("Interactions for", gene_name + ":\t" + ', '.join(message))
         else:
             print("Interactions for", gene_name + ":\t None")
 
+    def pretty_print(self, i):
+        print("--------------------")
+        print("Level", i ,"neighbors")
+
+
+    def find_level_interactions(self):
+        """ get all interactions for query gene up to args.levels """
+        new_interactions = self.all_interactions
+        for i in range(1, self.args.levels):
+            if self.args.print_interactions: self.pretty_print(i)
+            # get neighbors from the tuples
+            neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
+            # add the ones we haven't seen before to the "levels" dict:
+            self.neighbordict[i] = [neighbor for neighbor in neighbors if neighbor not in self.nodes]
+            # keep track of already 'seen' nodes
+            self.nodes.update(neighbors)
+            new_interactions = []
+            # collect all the new interactions
+            for neighbor in neighbors:
+                neighbor_interaction = self.get_interactions(neighbor)
+                if self.args.print_interactions: self.print_interactions(neighbor, neighbor_interaction)
+                # append list of interactions to all interactions
+                self.all_interactions.extend(neighbor_interaction)
+                new_interactions.extend(neighbor_interaction)
+
+        # for the last neighbors
+        neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
+        self.neighbordict[self.args.levels] = list(
+            set([neighbor for neighbor in neighbors if neighbor not in self.nodes]))
+        self.nodes.update(neighbors)
+
 
     def find_all_interactions(self):
+        """ Get all interactions for  a gene """
+        new_interactions = self.all_interactions
+        i = 0
+        neighbor_count = 0
+        while len(new_interactions) is not 0:
+            i += 1
+            if self.args.print_interactions: print("Total number of unique neighbors:", len(self.nodes))
 
 
-        # get all interactions for query gene up to args.levels
-        if self.args.levels >= 1:
-            new_interactions = self.all_interactions
-            for i in range(1, self.args.levels):
-                self.pretty_print(i)
-                # get neighbors from the tuples
-                neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
-                # add the ones we haven't seen before to the "levels" dict:
-                self.neighbordict[i] = [neighbor for neighbor in neighbors if neighbor not in self.nodes]
-                # keep track of already 'seen' nodes
-                self.nodes.update(neighbors)
-                new_interactions = []
-                # collect all the new interactions
-                for neighbor in neighbors:
-                    neighbor_interaction = self.get_interactions(neighbor)
-                    if self.args.print_interactions: self.print_interactions(neighbor, neighbor_interaction)
-                    # append list of interactions to all interactions
-                    self.all_interactions.extend(neighbor_interaction)
-                    new_interactions.extend(neighbor_interaction)
-            # for the last neighbors
+            # get neighbors from the tuples
             neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
-            self.neighbordict[self.args.levels] = list(
-                set([neighbor for neighbor in neighbors if neighbor not in self.nodes]))
+
+            neighbor_count += len(neighbors)
+
+
+            # add the ones we haven't seen before to the "levels" dict:
+            self.neighbordict[i] = [neighbor for neighbor in neighbors if neighbor not in self.nodes]
+            # keep track of already 'seen' nodes
             self.nodes.update(neighbors)
+            new_interactions = []
 
-        """
-        # Get all interactions for  a gene
-        elif self.args.levels == 'all':
-            new_interactions = self.all_interactions
 
-            while len(new_interactions) is not 0:
-                new_neighbors = [neighbor[1] for neighbor in new_interactions]
-                new_interactions = []
-                for neighbor in new_neighbors:
+            if len(neighbors) == 0 or len(self.nodes) >= 500:
+                print("Node count exceeded 500 at level", i, "\nWe recommend using the level parameter")
+                break
 
-                    # get interactions for new neighbors
-                    interactions = self.get_interactions(neighbor)
+            if self.args.print_interactions: self.pretty_print(i)
+            for neighbor in self.neighbordict[i]:
+                # get interactions for new neighbors
+                neighbor_interaction = self.get_interactions(neighbor)
+                if self.args.print_interactions: self.print_interactions(neighbor, neighbor_interaction)
+                new_interactions.extend(neighbor_interaction) # append only new neighbors
+                # keep all interactions in this:
+                self.all_interactions.extend(neighbor_interaction)
 
-                    new_interactions.extend(interactions) # append only new neighbors
-
-                    # keep all interactions in this:
-                    self.all_interactions.extend(interactions)
-
-        """
+        # for the last neighbors
+        neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
+        self.neighbordict[self.args.levels] = list(
+            set([neighbor for neighbor in neighbors if neighbor not in self.nodes]))
+        self.nodes.update(neighbors)
+        print("Total number of nodes:", len(self.nodes))
 
 
     def visualize(self, format='image'):
@@ -159,9 +185,6 @@ class geneInteractions:
                 'Collision' : True,
             })
 
-    def pretty_print(self, i):
-        print("--------------------")
-        print("Level", i ,"neighbors")
 
     def main(self):
         self.arg_parser()
@@ -176,10 +199,15 @@ class geneInteractions:
         self.neighbordict = dict()
         self.neighbordict[0] = [self.args.gene_name]
         self.nodes = set([self.args.gene_name])
+
+        print("#-#-# Interactions for #-#-#", self.args.gene_name)
         if self.args.print_interactions:
             self.pretty_print(0)
             self.print_interactions(self.args.gene_name, self.all_interactions)
-        self.find_all_interactions()
+        if type(self.args.levels) == int:
+            self.find_level_interactions()
+        elif self.args.levels == 'all':
+            self.find_all_interactions()
 
         if self.args.visualize:
             self.visualize(format=self.args.output_format)
