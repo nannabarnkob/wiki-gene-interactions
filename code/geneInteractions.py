@@ -33,6 +33,7 @@ class geneInteractions:
         parser.add_argument('-output-name', '--output-name', type=str, default="gene_name_" + "interactions")
         parser.add_argument('-levels',default=1,help="Number of neighboring genes you wish to include in the visualization")
         parser.add_argument('-id','--gene_id', default=None, help="ID for search")
+        parser.add_argument('-sif', '--sif', action='store_true', help="Write to sif")
         self.args = parser.parse_args()
         try:
             self.args.levels = int(self.args.levels)
@@ -60,11 +61,16 @@ class geneInteractions:
 
 
     def print_interactions(self, gene_name, interactions):
-        message = [tuple[1] for tuple in interactions]
-        if len(message) > 0:
-            print("Interactions for", gene_name + ":\t" + ', '.join(message))
-        else:
-            print("Interactions for", gene_name + ":\t None")
+        gene_list = [tuple[1] for tuple in interactions]
+        if self.args.sif == False:
+            if len(message) > 0:
+                print("Interactions for", gene_name + ":\t" + ', '.join(gene_list))
+            else:
+                print("Interactions for", gene_name + ":\t None")
+
+        elif self.args.sif == True:
+            for gene in gene_list:
+                self.fh.write(gene_name + ' pp ' + gene + '\n')
 
     def pretty_print(self, i):
         print("--------------------")
@@ -200,6 +206,8 @@ class geneInteractions:
         self.neighbordict[0] = [self.args.gene_name]
         self.nodes = set([self.args.gene_name])
 
+        if self.args.sif == True:
+            self.fh = open('gene-interactions.sif', 'w')
         print("#-#-# Interactions for", self.args.gene_name, " #-#-#")
         if self.args.print_interactions:
             self.pretty_print(0)
