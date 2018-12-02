@@ -200,7 +200,7 @@ class geneInteractions:
         self.neighbordict[0] = [self.args.gene_name]
         self.nodes = set([self.args.gene_name])
 
-        print("#-#-# Interactions for #-#-#", self.args.gene_name)
+        print("#-#-# Interactions for", self.args.gene_name, " #-#-#")
         if self.args.print_interactions:
             self.pretty_print(0)
             self.print_interactions(self.args.gene_name, self.all_interactions)
