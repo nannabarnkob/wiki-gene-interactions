@@ -68,16 +68,13 @@ class geneInteractions:
 
 
     def find_all_interactions(self):
-        self.neighbordict = dict()
-        self.neighbordict[0] = [self.args.gene_name]
-        self.nodes = set([self.args.gene_name])
+
 
         # get all interactions for query gene up to args.levels
         if self.args.levels >= 1:
             new_interactions = self.all_interactions
             for i in range(1, self.args.levels):
-                print("--------------------")
-                print("Level", i, "neighbors")
+                self.pretty_print(i)
                 # get neighbors from the tuples
                 neighbors = list(set([neighbor[1] for neighbor in new_interactions]))
                 # add the ones we haven't seen before to the "levels" dict:
@@ -121,7 +118,6 @@ class geneInteractions:
 
     def visualize(self, format='image'):
         G = nx.DiGraph()
-        G.add_node(self.args.gene_name, node_color='red')
         # first build graphs
         for interaction in self.all_interactions:
             G.add_edge(interaction[0], interaction[1])
@@ -163,7 +159,9 @@ class geneInteractions:
                 'Collision' : True,
             })
 
-
+    def pretty_print(self, i):
+        print("--------------------")
+        print("Level", i ,"neighbors")
 
     def main(self):
         self.arg_parser()
@@ -174,11 +172,12 @@ class geneInteractions:
             self.convert_ID_to_genesymbol()
 
         # get and print level 0
-        self.all_interactions = self.get_interactions(self.args.gene_name)
-
+        self.all_interactions = self.get_interactions(self.args.gene_name) # all interactions at this point
+        self.neighbordict = dict()
+        self.neighbordict[0] = [self.args.gene_name]
+        self.nodes = set([self.args.gene_name])
         if self.args.print_interactions:
-            print("--------------------")
-            print("Level 0 neighbors")
+            self.pretty_print(0)
             self.print_interactions(self.args.gene_name, self.all_interactions)
         self.find_all_interactions()
 
