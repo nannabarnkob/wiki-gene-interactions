@@ -16,6 +16,8 @@ from netwulf import visualize
 import pydot
 from networkx.drawing.nx_pydot import graphviz_layout
 import pdb
+import os
+import subprocess
 
 class geneInteractions:
     def arg_parser(self):
@@ -27,13 +29,14 @@ class geneInteractions:
         parser.add_argument('-gene', '--gene-name', type=str, help='The gene which interactions is wanted (alias or main symbol)')
         parser.add_argument('-id', '--gene_id', default=None, help="Use gene ID for search query instead of gene name.")
         parser.add_argument('-viz', '--visualize', action='store_true', help='Whether or not you want to build a graph visualization from the interaction network')
-        parser.add_argument('-print-interactions', action='store_true',
+        parser.add_argument('-print', '--print-interactions', action='store_true', default=True,
                             help='Whether or not you want to see the interactions for the gene printed to stdout')
+        parser.add_argument('-quiet', action='store_true')
         parser.add_argument('-output-fmt', '--output-format', type=str, default='image', help="The format of your graph, choices are image and d3. Image will use networkx and is better with smaller graphs.")
         parser.add_argument('-output-method', '--output-method', type=str, default='display', help='Whether you want to visualize the graph as pop-up or save it for later. Only works with image.')
         parser.add_argument('-output-name', '--output-name', type=str, default="gene_name_" + "interactions")
         parser.add_argument('-levels',default=1,help="Number of neighboring genes you wish to include in the visualization")
-        parser.add_argument('-sif', '--sif', action='store_true', default=False, help="Write to sif. If this flag is not given, the interactions are written to stdout")
+        parser.add_argument('-sif', '--sif', action='store_true', help="Write to sif. If this flag is not given, the interactions are written to stdout")
         self.args = parser.parse_args()
         try:
             self.args.levels = int(self.args.levels)
@@ -73,8 +76,9 @@ class geneInteractions:
                 print("Interactions for", gene_name + ":\t None")
 
     def pretty_print(self, i):
-        print("--------------------")
-        print("Level", i ,"neighbors")
+        if not self.args.sif:
+            print("--------------------")
+            print("Level", i+1 ,"neighbors")
 
 
     def find_level_interactions(self):
@@ -102,6 +106,8 @@ class geneInteractions:
         self.neighbordict[self.args.levels] = list(
             set([neighbor for neighbor in neighbors if neighbor not in self.nodes]))
         self.nodes.update(neighbors)
+
+        print("Total number of nodes:", len(self.nodes))
 
 
     def find_all_interactions(self):
@@ -135,6 +141,7 @@ class geneInteractions:
             for neighbor in self.neighbordict[i]:
                 # get interactions for new neighbors
                 neighbor_interaction = self.get_interactions(neighbor)
+                # print neighbors as we go
                 if self.args.print_interactions: self.print_interactions(neighbor, neighbor_interaction)
                 new_interactions.extend(neighbor_interaction) # append only new neighbors
                 # keep all interactions in this:
@@ -148,12 +155,14 @@ class geneInteractions:
         print("Total number of nodes:", len(self.nodes))
 
 
-    def visualize(self, format='image'):
+
+    def visualize(self):
         G = nx.DiGraph()
         # first build graphs
         for interaction in self.all_interactions:
             G.add_edge(interaction[0], interaction[1])
-        if format == 'image':
+
+        if self.args.output_format == 'image':
             print("Visualizing using networkx")
 
             nlayout = graphviz_layout(G, prog="neato")
@@ -180,7 +189,7 @@ class geneInteractions:
             elif self.args.output_format == 'save':
                 plt.savefig(self.args.output_name+ ".png")
 
-        elif format == 'd3':
+        elif self.args.output_format == 'd3':
             print("Visualizing using D3")
             print("Use ctrl+c to quit")
             visualize(G, config={
@@ -192,33 +201,63 @@ class geneInteractions:
             })
 
 
-    def main(self):
-        self.arg_parser()
-        # print namespace for args:
-        print("Got arguments:", self.args)
-        self.connect_to_database()
-        if self.args.gene_id:
-            self.convert_ID_to_genesymbol()
-
+    def find_interactions(self):
         # get and print level 0
-        self.all_interactions = self.get_interactions(self.args.gene_name) # all interactions at this point
+        self.all_interactions = self.get_interactions(self.args.gene_name)  # all interactions at this point
         self.neighbordict = dict()
         self.neighbordict[0] = [self.args.gene_name]
         self.nodes = set([self.args.gene_name])
 
-        if self.args.sif == True:
-            self.fh = open('gene-interactions.sif', 'w')
-        print("#-#-# Interactions for", self.args.gene_name, " #-#-#")
+
         if self.args.print_interactions:
+            print("#-#-# Interactions for", self.args.gene_name, " #-#-#")
             self.pretty_print(0)
             self.print_interactions(self.args.gene_name, self.all_interactions)
+
+        # function call based on whether level arg is an integer or 'all'
         if type(self.args.levels) == int:
             self.find_level_interactions()
         elif self.args.levels == 'all':
             self.find_all_interactions()
 
+    def process_args(self):
+        if self.args.gene_id:
+            self.convert_ID_to_genesymbol()
+
+        # open sif-file
+        if self.args.sif:
+            self.fh = open('gene-interactions-temp.sif', 'w')
+
+        # turn off printing
+        if self.args.quiet:
+            self.args.print_interactions = False
+
+    def close_sif(self):
+        # close temporary file
+        self.fh.close()
+        pwd = os.getcwd()
+        # only keep unique interactions
+        command = 'sort -u "{oldfile}" > "{newfile}"'.format(oldfile=pwd + '/gene-interactions-temp.sif',
+                                                             newfile=pwd + '/gene-interactions.sif')
+        subprocess.call(command, shell=True)
+        # remove the temporary file
+        os.remove(pwd + '/gene-interactions-temp.sif')
+
+
+    def main(self):
+        self.arg_parser()
+        # print namespace for args:
+        print("Got arguments:", self.args)
+
+        self.connect_to_database()
+        self.process_args()
+        self.find_interactions()
+
         if self.args.visualize:
-            self.visualize(format=self.args.output_format)
+            self.visualize()
+
+        if self.args.sif:
+            self.close_sif()
 
 
 if __name__ == '__main__':
