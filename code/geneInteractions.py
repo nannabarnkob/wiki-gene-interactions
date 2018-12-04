@@ -24,19 +24,30 @@ class geneInteractions:
         # build argument parser
         parser = argparse.ArgumentParser(
             description='Get and visualize interactions for a wanted gene. '
-                        'Example usage: ./geneInteractions.py --gene-name DNAH8 --visualize -output_format image')
-        parser.add_argument('-db', '--database', type=str, default='gene-database', help="Name of database made with buildDatabase and WikiScraper(Parralelized)")
-        parser.add_argument('-gene', '--gene-name', type=str, help='The gene which interactions is wanted (alias or main symbol)')
-        parser.add_argument('-id', '--gene_id', default=None, help="Use gene ID for search query instead of gene name.")
-        parser.add_argument('-viz', '--visualize', action='store_true', help='Whether or not you want to build a graph visualization from the interaction network')
+                        'Example usage: ./geneInteractions.py -gene ZWINT -print --visualize -output-fmt image')
+        parser.add_argument('-db', '--database', type=str, default='gene-database',
+                            help="Name of database made with buildDatabase and WikiScraper(Parralelized)")
+        parser.add_argument('-gene', '--gene-name', type=str,
+                            help='The gene which interactions is wanted (alias or main symbol)')
+        parser.add_argument('-id', '--gene_id', default=None,
+                            help="Use gene ID for search query instead of gene name.")
+        parser.add_argument('-viz', '--visualize', action='store_true',
+                            help='Whether or not you want to build a graph visualization from the interaction network')
         parser.add_argument('-print', '--print-interactions', action='store_true', default=True,
                             help='Whether or not you want to see the interactions for the gene printed to stdout')
-        parser.add_argument('-quiet', action='store_true')
-        parser.add_argument('-output-fmt', '--output-format', type=str, default='image', help="The format of your graph, choices are image and d3. Image will use networkx and is better with smaller graphs.")
-        parser.add_argument('-output-method', '--output-method', type=str, default='display', help='Whether you want to visualize the graph as pop-up or save it for later. Only works with image.')
+        parser.add_argument('-quiet', '--no-print', action='store_true',
+                            help="Suppress interaction output both in terms of stdout and sif-file")
+        parser.add_argument('-output-fmt', '--output-format', type=str, default='image',
+                            help="The format of your graph, choices are image and d3. Image will use networkx "
+                                 "and is better with smaller graphs.")
+        parser.add_argument('-output-method', '--output-method', type=str, default='display',
+                            help='Whether you want to visualize the graph as pop-up or save it for later. '
+                                 'Only works with image.')
         parser.add_argument('-output-name', '--output-name', type=str, default="gene_name_" + "interactions")
-        parser.add_argument('-levels',default=1,help="Number of neighboring genes you wish to include in the visualization")
-        parser.add_argument('-sif', '--sif', action='store_true', help="Write to sif. If this flag is not given, the interactions are written to stdout")
+        parser.add_argument('-levels',default=1,
+                            help="Number of neighboring genes you wish to include in the visualization")
+        parser.add_argument('-sif', '--sif', action='store_true',
+                            help="Write to sif. If this flag is not given, the interactions are written to stdout")
         self.args = parser.parse_args()
         try:
             self.args.levels = int(self.args.levels)
@@ -45,15 +56,16 @@ class geneInteractions:
 
 
     def connect_to_database(self):
+        """ Set of connection to sqlite """
         db = sqlite3.connect(self.args.database)
         self.cursor = db.cursor()
 
     def convert_ID_to_genesymbol(self):
+        """ Look up ID to convert to main gene symbol """
         self.args.gene_name = self.cursor.execute(
             'select gene_symbol from gene_table where trim(gene_id) = ?',
             (self.args.gene_id,)).fetchall()[0][0]
         print(self.args.gene_name)
-        # interactions is a list of tuples
 
     def get_interactions(self, gene_name):
         """ Returns interaction partners for gene query """
@@ -64,6 +76,7 @@ class geneInteractions:
 
 
     def print_interactions(self, gene_name, interactions):
+        """" Print interactions either to stdout or to sif file"""
         gene_list = [tuple[1] for tuple in interactions]
         # assess whether we're writing to sif-file or printing to screen
         if self.args.sif:
@@ -76,6 +89,7 @@ class geneInteractions:
                 print("Interactions for", gene_name + ":\t None")
 
     def pretty_print(self, i):
+        """ Make a nice division in the stdout output """
         if not self.args.sif:
             print("--------------------")
             print("Level", i+1 ,"neighbors")
@@ -157,6 +171,7 @@ class geneInteractions:
 
 
     def visualize(self):
+        """ Visualize the interaction data either as a d3 graph or a networkx image """
         G = nx.DiGraph()
         # first build graphs
         for interaction in self.all_interactions:
@@ -202,6 +217,7 @@ class geneInteractions:
 
 
     def find_interactions(self):
+        """ Wrapper for finding all interactions up to args.levels or 'all' """
         # get and print level 0
         self.all_interactions = self.get_interactions(self.args.gene_name)  # all interactions at this point
         self.neighbordict = dict()
@@ -210,7 +226,7 @@ class geneInteractions:
 
 
         if self.args.print_interactions:
-            print("#-#-# Interactions for", self.args.gene_name, " #-#-#")
+            print("### Interactions for", self.args.gene_name, " ###")
             self.pretty_print(0)
             self.print_interactions(self.args.gene_name, self.all_interactions)
 
@@ -221,6 +237,7 @@ class geneInteractions:
             self.find_all_interactions()
 
     def process_args(self):
+        """ Process input arguments """
         if self.args.gene_id:
             self.convert_ID_to_genesymbol()
 
@@ -233,6 +250,7 @@ class geneInteractions:
             self.args.print_interactions = False
 
     def close_sif(self):
+        """ Make all lines in the sif file unique """
         # close temporary file
         self.fh.close()
         pwd = os.getcwd()
@@ -248,14 +266,12 @@ class geneInteractions:
         self.arg_parser()
         # print namespace for args:
         print("Got arguments:", self.args)
-
         self.connect_to_database()
         self.process_args()
         self.find_interactions()
 
         if self.args.visualize:
             self.visualize()
-
         if self.args.sif:
             self.close_sif()
 
