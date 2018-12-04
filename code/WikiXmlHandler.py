@@ -68,9 +68,10 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             #(raw_link_count, passed_links) = self.callback(**self._values)
             article_results = self.callback(**self._values)
 
-            if article_results:
-                if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
+            if article_results is not None and len(article_results[1]) > 0:
+                print("len(article[1] > 0")
                 raw_link_count, passed_links = article_results
+                if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
                 self._count_raw_links += raw_link_count
 
                 # add interactions to the database
@@ -81,8 +82,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         # Main gene which has interactions
         main_gene = self._values['title']
-
-
 
         # Find gene symbols for main gene if it's an alias
         main_gene_symbols = self.cursor.execute(
@@ -97,6 +96,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             # this means  that
             if gene_table_symbols[0][0] == 0:
                 self._count_wrong_titles += 1
+                # print("wrong title", gene_table_symbols[0][0])
                 # was not found in the database at all
                 return
             else:
@@ -124,7 +124,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                         (link,)).fetchall()
                     if check_gene_table[0][0] == 0:
                         self._count_wrong_interactions += 1
-                        print(link)
+                        # print("wrong link", check_gene_table[0][0])
                         continue
                     else:
                         interaction_symbols = check_gene_table

@@ -35,7 +35,7 @@ class geneInteractions:
                             help='Whether or not you want to build a graph visualization from the interaction network')
         parser.add_argument('-print', '--print-interactions', action='store_true', default=True,
                             help='Whether or not you want to see the interactions for the gene printed to stdout')
-        parser.add_argument('-quiet', '--no-print', action='store_true',
+        parser.add_argument('-quiet', action='store_true',
                             help="Suppress interaction output both in terms of stdout and sif-file")
         parser.add_argument('-output-fmt', '--output-format', type=str, default='image',
                             help="The format of your graph, choices are image and d3. Image will use networkx "
