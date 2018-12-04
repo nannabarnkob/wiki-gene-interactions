@@ -26,6 +26,7 @@ class ScrapeWikiParallelized:
         parser.add_argument('-partition_folder', help="Input folder containing Wikipedia partition files")
         parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
         parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')
+        parser.add_argument('-k', type=int, default=20, help="k for Bloom filter")
         parser.add_argument('-log', action='store_true',
                             help='Whether or not you want to produce log files from the scraping process')
         parser.add_argument('-np', '--nproc', type=int, default=4, help="Number of subprocesses you want to use")
@@ -39,7 +40,7 @@ class ScrapeWikiParallelized:
 
     def main(self):
         if self.args.method == 'bloom':
-            self.bloomfilter = BloomFunctions(self.args.safe_genes)
+            self.bloomfilter = BloomFunctions(self.args.safe_genes, self.args.k)
         if self.args.method == 'set':
             self.load_safegenes()
         self.parallelize()

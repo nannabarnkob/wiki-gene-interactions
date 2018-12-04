@@ -5,10 +5,12 @@ import random
 
 
 class BloomFunctions:
-    def __init__(self, filename):
+    def __init__(self, filename, k):
+        self.k = k
         # received from input set S (m = |S|)
         self.load(filename)
         self.main()
+
 
     def load(self, filename):
         """ Load training data """
@@ -22,8 +24,8 @@ class BloomFunctions:
                 line = x.replace("\n", "").replace("\r", "")
 
         self.m = len(self.goodData)
-        self.n = 20*self.m
-        self.k = int(self.n/self.m)
+
+        self.n = self.k*self.m
         self.A = np.zeros(self.n)
 
         print("Read ", len(self.goodData), " good genes")
@@ -96,4 +98,4 @@ class BloomFunctions:
         print("Total classifications: ", checkSize)
         print("False negative rate:", falseNeg / checkSize)
         print("False positive rate:", falsePos / checkSize)
-        print("Done!")
+        print("Training done!")

@@ -25,6 +25,7 @@ class ScrapeWiki:
         parser.add_argument('-wikipath', help="Wikipedia file (format bz-compressed XML")
         parser.add_argument('-safe_genes', help="Name of file with safe gene names", default='../data/gene_symbol_list.txt')
         parser.add_argument('-method', help="Input type of method to filter wiki", default='bloom')
+        parser.add_argument('-k', type=int, default=20, help="k for Bloom filter")
         parser.add_argument('-log', action='store_true',
                             help='Whether or not you want to produce log files from the scraping process')
         self.args = parser.parse_args()
@@ -36,7 +37,7 @@ class ScrapeWiki:
 
     def main(self):
         if self.args.method == 'bloom':
-            self.bloomfilter = BloomFunctions(self.args.safe_genes)
+            self.bloomfilter = BloomFunctions(self.args.safe_genes, self.args.k)
         if self.args.method == 'set':
             self.load_safegenes()
         self.total_articles, self.total_links, self.total_wrong_genesymbols, self.total_wrong_interactions = self.process_wiki()
@@ -115,5 +116,5 @@ if __name__ == '__main__':
     print("Total wrong titles:", wikiscraper.total_wrong_genesymbols)
     print("Total wrong interactions:", wikiscraper.total_wrong_interactions)
     print("Total links", wikiscraper.total_links)
-    print("Total articles", wikiscraper.total_articles)
+    print("Total titles", wikiscraper.total_articles)
 
