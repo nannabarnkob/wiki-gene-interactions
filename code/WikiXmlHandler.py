@@ -72,6 +72,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
                 if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
                 raw_link_count, passed_links = article_results
                 self._count_raw_links += raw_link_count
+
                 # add interactions to the database
                 self.add_interactions(passed_links)
 
@@ -85,13 +86,13 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         # Find gene symbols for main gene if it's an alias
         main_gene_symbols = self.cursor.execute(
-            "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+            "SELECT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
             (main_gene, main_gene)).fetchall()
 
         if main_gene_symbols[0][0] == 0:
             # check for main symbol
             gene_table_symbols = self.cursor.execute(
-                "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+                "SELECT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
                 (main_gene, )).fetchall()
             # this means  that
             if gene_table_symbols[0][0] == 0:
@@ -113,13 +114,13 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
                 # If an interaction is an alias - find its symbol
                 interaction_symbols = self.cursor.execute(
-                    "SELECT DISTINCT CASE WHEN  COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
+                    "SELECT CASE WHEN  COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM aliases WHERE trim(gene_alias) = ? OR trim(gene_symbol) = ?",
                     (link, link)).fetchall()
 
 
                 if interaction_symbols[0][0] == 0:
                     check_gene_table = self.cursor.execute(
-                        "SELECT DISTINCT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
+                        "SELECT CASE WHEN COUNT(1) > 0 THEN gene_symbol ELSE 0 END FROM gene_table WHERE trim(gene_symbol) = ?",
                         (link,)).fetchall()
                     if check_gene_table[0][0] == 0:
                         self._count_wrong_interactions += 1
