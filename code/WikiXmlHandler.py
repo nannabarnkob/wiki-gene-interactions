@@ -69,7 +69,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             article_results = self.callback(**self._values)
 
             if article_results is not None and len(article_results[1]) > 0:
-                print("len(article[1] > 0")
+                
                 raw_link_count, passed_links = article_results
                 if self.log: self.fh_interactions.write(self._values['title'] + '\t' + ', '.join(passed_links) + '\n')
                 self._count_raw_links += raw_link_count
